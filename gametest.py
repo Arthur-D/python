@@ -420,7 +420,7 @@ class BuildingManager():
         selection = buildingsListbox.curselection()
         selection_id = int(selection[0])
         self.queuemanager.building_queue.insert(0, "%s" % (self.buildings_list[selection_id]))
-        self.queuemanager.building_queue.insert(0, "Test")
+        # self.queuemanager.building_queue.insert(0, "Test")
         print("Building queue: ", self.queuemanager.building_queue)
         self.currently_building = self.queuemanager.building_queue[len(self.queuemanager.building_queue)-1]
         self.queuemanager.building_queueStringVar.set(self.queuemanager.building_queue)
