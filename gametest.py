@@ -340,7 +340,12 @@ class QueueManager():
                 self.turnmanager.turns_left_building_queue -= self.buildingmanager.buildings_dict.get(self.building_queue[selection_id])
                 self.turnmanager.turns_left_building_queueStringVar.set("Turns left: %s" % self.turnmanager.turns_left_building_queue)
             self.turnmanager.turns_left_building_queueStringVar.set("Turns left: %s" % self.turnmanager.turns_left_building_queue)
+
+            # temp_building_queue = [building for building in self.building_queue if building != self.building_queue[selection_id]]
+            # print("temp_building_queue: ", temp_building_queue)
             self.building_queue.remove(self.building_queue[selection_id])
+            for index, building in enumerate(self.building_queue):
+                print("Building index in remove_from_building_queue:", index, building)
             self.building_queueStringVar.set(self.building_queue)
             if len(self.building_queue)-1 > -1:
                 self.buildingmanager.currently_building = self.building_queue[len(self.building_queue) - 1]
