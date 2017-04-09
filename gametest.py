@@ -249,6 +249,7 @@ class TurnManager():
                     self.queuemanager.building_queue[self.buildingmanager.currently_building_index]]
             for index, building in enumerate(self.queuemanager.building_queue):
                 print("Building index:", index, building)
+                print("self.buildingmanager.currently_building_index: ", self.buildingmanager.currently_building_index)
                 if index != self.buildingmanager.currently_building_index:
                     turn_amount += self.buildingmanager.buildings_dict.get(building)
                 elif len(self.queuemanager.building_queue) == 1:
@@ -400,14 +401,18 @@ class BuildingManager():
         self.building_descriptionStringVar.set("Test2")
 
 
+    def set_currently_building(self):
+        self.currently_building = self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1]
+        self.currently_building_index = len(self.queuemanager.building_queue) - 1
+
+
     # Controls what happens when double clicking an item in the building list.
     def add_buildings(self, buildingsListbox):
         selection = buildingsListbox.curselection()
         selection_id = int(selection[0])
         self.queuemanager.building_queue.insert(0, "%s" % (self.buildings_list[selection_id]))
-        # self.queuemanager.building_queue.insert(0, "Test")
         print("Building queue: ", self.queuemanager.building_queue)
-        self.currently_building = self.queuemanager.building_queue[len(self.queuemanager.building_queue)-1]
+        self.set_currently_building()
         self.queuemanager.building_queueStringVar.set(self.queuemanager.building_queue)
 
 
