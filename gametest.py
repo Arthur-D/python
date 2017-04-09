@@ -325,25 +325,21 @@ class QueueManager():
 
     # Handles removal of buildings from building queue.
     def remove_from_building_queue(self, building_queueListbox):
-        turn_amount = 0
         selection = building_queueListbox.curselection()
         if self.building_queue and len(selection) == 1:
             selection_id = int(selection[0])
-            left_over_turn_amount = self.turnmanager.turns_left_current_building
             print("selection_id and len(self.building_queue)-1: ", selection_id, len(self.building_queue)-1)
             if selection_id == len(self.building_queue)-1:
                 self.turnmanager.turns_left_building_queue -= self.turnmanager.turns_left_current_building
                 print("Removed %s turns." % self.turnmanager.turns_left_current_building)
                 self.turnmanager.turns_left_building_queueStringVar.set("Turns left: %s" % self.turnmanager.turns_left_building_queue)
-                self.turnmanager.turns_left_current_building = self.buildingmanager.buildings_dict[self.building_queue[self.buildingmanager.currently_building_index]]
+                self.turnmanager.turns_left_current_building = self.buildingmanager.buildings_dict[self.building_queue[len(self.building_queue)-2]]
             else:
                 self.turnmanager.turns_left_building_queue -= self.buildingmanager.buildings_dict.get(self.building_queue[selection_id])
                 self.turnmanager.turns_left_building_queueStringVar.set("Turns left: %s" % self.turnmanager.turns_left_building_queue)
             self.turnmanager.turns_left_building_queueStringVar.set("Turns left: %s" % self.turnmanager.turns_left_building_queue)
 
-            # temp_building_queue = [building for building in self.building_queue if building != self.building_queue[selection_id]]
-            # print("temp_building_queue: ", temp_building_queue)
-            self.building_queue.remove(self.building_queue[selection_id])
+            self.building_queue.pop(selection_id)
             for index, building in enumerate(self.building_queue):
                 print("Building index in remove_from_building_queue:", index, building)
             self.building_queueStringVar.set(self.building_queue)
@@ -351,17 +347,13 @@ class QueueManager():
                 self.buildingmanager.currently_building = self.building_queue[len(self.building_queue) - 1]
             else:
                 self.turnmanager.turns_left_current_building = 0
-            #print("self.turns_left_building_queue -= self.turns_left_current_building: ", self.turns_left_building_queue -= self.turns_left_current_building)
             print("Buildings.buildings_list[selection_id]: ", self.buildingmanager.buildings_list[selection_id])
             print("selection and selection_id: ", selection, selection_id)
-            #self.set_turns_left_building_queue(turn_amount)
         else:
             print("No more buildings to remove.")
-            self.turnmanager.turns_left_current_building = 0
-            self.building_queueStringVar.set(self.building_queue)
             print("Building queue empty")
-        print("self.building_queue empty: ", self.building_queue)
-        self.turnmanager.turns_left_current_buildingStringVar.set("Turns left for\ncurrent building: %s" % self.turnmanager. turns_left_current_building)
+        self.turnmanager.turns_left_current_buildingStringVar.set(
+            "Turns left for\ncurrent building: %s" % self.turnmanager.turns_left_current_building)
 
 
 
