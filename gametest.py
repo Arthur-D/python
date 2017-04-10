@@ -264,6 +264,15 @@ class TurnManager():
 
 
     def decrease_building_queue_turns(self):
+        # print("self.turns_left_building_queue in decrease_building_queue_turns: ", self.turns_left_building_queue)
+        if self.turns_left_building_queue > 1:
+            self.turns_left_building_queue -= 1
+            self.turns_left_building_queueStringVar.set("Turns left: %s" % self.turns_left_building_queue)
+            print("Set turns left to", self.turns_left_building_queue)
+        else:
+            self.turns_left_building_queue = 0
+            self.turns_left_building_queueStringVar.set("Queue empty")
+            print("Set turns left to 0")
         if self.turns_left_current_building > 1:
             self.turns_left_current_building -= 1
             self.turns_left_current_buildingStringVar.set(
@@ -274,14 +283,6 @@ class TurnManager():
             self.buildingmanager.add_built(self.buildingmanager.currently_building)
             if not self.queuemanager.building_queue:
                 self.turns_left_current_building = 0
-        if self.turns_left_building_queue > 1:
-            self.turns_left_building_queue -= 1
-            self.turns_left_building_queueStringVar.set("Turns left: %s" % self.turns_left_building_queue)
-            print("Set turns left to", self.turns_left_building_queue)
-        else:
-            self.turns_left_building_queue = 0
-            self.turns_left_building_queueStringVar.set("Queue empty")
-            print("Set turns left to 0")
 
 
     def remove_building_queue_turns(self, selection_id=None):
@@ -376,8 +377,6 @@ class BuildingManager():
 
     def set_queuemanager(self, queuemanager):
         self.queuemanager = queuemanager
-        # FIXME: self.currently_building_index appears to have a value of -1 since it's initialized before the fun starts.'
-        self.currently_building_index = len(self.queuemanager.building_queue)-1
 
 
     # Populate the list of built buildings with building names in self.buildings_list.
@@ -402,8 +401,9 @@ class BuildingManager():
 
 
     def set_currently_building(self):
-        self.currently_building = self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1]
-        self.currently_building_index = len(self.queuemanager.building_queue) - 1
+        if self.queuemanager.building_queue:
+            self.currently_building = self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1]
+            self.currently_building_index = len(self.queuemanager.building_queue) - 1
 
 
     # Controls what happens when double clicking an item in the building list.
@@ -422,7 +422,7 @@ class BuildingManager():
             self.queuemanager.building_queue.pop()
             self.queuemanager.building_queueStringVar.set(self.queuemanager.building_queue)
             self.turnmanager.turns_left_current_buildingStringVar.set("Built %s" % self.currently_building)
-            self.currently_building_index = len(self.queuemanager.building_queue) - 1
+            self.set_currently_building()
         else:
             # self.turnmanager.turns_left_current_building = 0
             self.queuemanager.building_queueStringVar.set(self.queuemanager.building_queue)
@@ -436,10 +436,12 @@ class BuildingManager():
         else:
             print("No building to increase!")
         if self.queuemanager.building_queue:
-            self.currently_building = self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1]
-            self.turnmanager.turns_left_current_building = self.buildings_dict[self.queuemanager.building_queue[self.currently_building_index]]
+            self.set_currently_building()
+            # self.turnmanager.turns_left_current_building = self.buildings_dict[self.queuemanager.building_queue[self.currently_building_index]]
+            self.turnmanager.set_turns_left_current_building()
         else:
             self.currently_building = None
+        # self.set_currently_building()
 
 
 
