@@ -345,7 +345,7 @@ class QueueManager():
         if len(selection) == 1:
             selection_id = int(selection[0])
             if self.building_queue:
-                print("selection_id and self.buildingmanager.currently_building_index in delete_from_building_queue: ",
+                print("selection_id and self.buildingmanager.currently_building_index in delete_from_building_queue 1: ",
                       selection_id, self.buildingmanager.currently_building_index)
                 self.buildingmanager.set_previous_building()
                 self.building_queue.pop(selection_id)
@@ -354,10 +354,12 @@ class QueueManager():
             selection_id = None
             print("No more buildings to remove. Building queue empty.")
         self.buildingmanager.set_currently_building()
+        self.buildingmanager.set_currently_building_index()
         print("len(selection) in delete_from_building_queue: ", len(selection))
         if len(selection) == 1:
             self.buildingmanager.set_building_construction()
-        if selection_id != self.buildingmanager.currently_building_index:
+        print("selection_id and self.buildingmanager.currently_building_index in QueueManager.delete_from_building_queue 2: ", selection_id, self.buildingmanager.currently_building_index)
+        if selection_id == self.buildingmanager.currently_building_index + 1:
             self.turnmanager.set_turns_left_current_building()
         self.turnmanager.set_turns_left_building_queue()
         # self.turnmanager.set_turns_left_building_queue(turn_amount=self.turnmanager.turns_left_current_building)
@@ -413,19 +415,27 @@ class BuildingManager():
 
 
     def set_building_description(self, buildingsListbox):
-        # selection = buildingsListbox.curselection()
-        # print("selection in set_building_description: ", selection)
-        # selection_id = int(selection[0])
-        # print("selection_id in set_building_description: ", selection_id)
-        # if selection_id == 1:
-        #     self.building_descriptionStringVar.set("Test2")
-        pass
+        print("buildingsListbox in BuildingManager.set_building_description: ", buildingsListbox)
+        selection = buildingsListbox.curselection()
+        print("selection in set_building_description: ", selection)
+        if selection:
+            selection_id = int(selection[0])
+            print("selection_id in set_building_description: ", selection_id)
+            if selection_id == 1:
+                self.building_descriptionStringVar.set("Test2")
+        # pass
+
+
+    def set_currently_building_index(self):
+        self.currently_building_index = len(self.queuemanager.building_queue) - 1
+        # print("self.currently_building_index in BuildingManager.set_currently_building_index: ", self.currently_building_index)
 
 
     def set_currently_building(self):
         if self.queuemanager.building_queue:
             self.currently_building = self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1]
-            self.currently_building_index = len(self.queuemanager.building_queue) - 1
+            print("len(self.queuemanager.building_queue) - 1 in BuildingManager.set_currently_building: ", len(self.queuemanager.building_queue) - 1)
+            self.set_currently_building_index()
         else:
             self.currently_building = None
             self.currently_building_index = None
@@ -444,23 +454,26 @@ class BuildingManager():
                 self.building_buildingStringVar.set("Building %s" % self.currently_building)
             if self.queuemanager.building_queue and self.turnmanager.turns_left_current_building == 1:
                 self.building_buildingStringVar.set("Building %s" % self.currently_building)
-                self.built_buildingStringVar.set("Built %s" % self.previous_building)
+                # self.built_buildingStringVar.set("Built %s" % self.previous_building)
         else:
             self.building_buildingStringVar.set("Nothing to build")
-        if self.previous_building:
-            if self.turnmanager.turns_left_building_queue == 0 and not self.currently_building:
-                self.built_buildingStringVar.set("Built %s" % self.previous_building)
+        # if self.previous_building:
+        #     if self.turnmanager.turns_left_building_queue == 0 and not self.currently_building:
+        #         self.built_buildingStringVar.set("Built %s" % self.previous_building)
 
 
     # Controls what happens when double clicking an item in the building list.
     def add_buildings(self, buildingsListbox):
+        print("buildingsListbox in BuildingManager.add_buildings: ", buildingsListbox)
         selection = buildingsListbox.curselection()
         print("selection in add_buildings: ", selection)
         selection_id = int(selection[0])
         print("selection_id in add_buildings: ", selection_id)
         self.queuemanager.add_to_building_queue(selection_id)
         self.set_currently_building()
-        self.turnmanager.set_turns_left_current_building()
+        self.set_currently_building_index()
+        if len(self.queuemanager.building_queue) == 1:
+            self.turnmanager.set_turns_left_current_building()
         self.turnmanager.set_turns_left_building_queue()
         self.set_building_construction()
 
@@ -468,6 +481,8 @@ class BuildingManager():
     # This defines what happens when finishing building something.
     def add_built(self, currently_building):
         self.set_previous_building()
+        if self.previous_building:
+            self.built_buildingStringVar.set("Built %s" % self.previous_building)
         self.queuemanager.remove_from_building_queue()
         if currently_building == "House":
             self.houses_number += 1
@@ -477,9 +492,10 @@ class BuildingManager():
             self.air_purifiers_numberStringVar.set("Air purifiers: %s" % self.air_purifiers_number)
         else:
             print("No building to increase!")
-        self.set_currently_building()
-        self.set_building_construction()
-        self.turnmanager.set_turns_left_current_building()
+        if currently_building:
+            self.set_currently_building()
+            self.set_building_construction()
+            self.turnmanager.set_turns_left_current_building()
 
 
 
