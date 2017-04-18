@@ -185,7 +185,7 @@ class GUI(Frame):
 
 
 
-# Class containing the actual game logic.
+# High level class getting the simulation started.
 class GameLogic():
     def __init__(self):
         self.playernameStringVar = StringVar()
@@ -204,7 +204,6 @@ class GameLogic():
     def run_simulation(self):
         self.turnmanager.increase_game_turns()
         self.turnmanager.decrease_building_queue_turns()
-        # self.buildingmanager.set_built_building()
 
 
     # Logic for saving playername to labels in GUI.
@@ -220,6 +219,7 @@ class GameLogic():
 
 
 
+# Class managing all turns.
 class TurnManager():
     def __init__(self):
         self.turn = 0
@@ -241,13 +241,12 @@ class TurnManager():
 
 
     # Logic for displaying how many turns are left to build the whole building queue.
-    def set_turns_left_building_queue(self, turn_amount=0):
+    def set_turns_left_building_queue(self):
+        turn_amount = 0
         for index, building in enumerate(self.queuemanager.building_queue):
             print("Building index:", index, building)
             if index != self.buildingmanager.get_currently_building_index():
                 turn_amount += self.buildingmanager.buildings_dict.get(building)
-            # elif len(self.queuemanager.building_queue) == 1:
-            #     turn_amount += self.buildingmanager.buildings_dict.get(building)
             else:
                 turn_amount += self.turns_left_current_building
         self.turns_left_building_queue = turn_amount
@@ -257,28 +256,17 @@ class TurnManager():
 
     # Logic for displaying how many turns are left building the foremost building in the queue.
     def set_turns_left_current_building(self):
-        turn_amount = 0
         print(self.queuemanager.building_queue)
         if self.queuemanager.building_queue:
-            # if self.turns_left_current_building <= 1:
             self.turns_left_current_building = self.buildingmanager.buildings_dict[self.buildingmanager.get_currently_building()]
-            # for index, building in enumerate(self.queuemanager.building_queue):
-            #     print("Building index:", index, building)
-            #     print("self.buildingmanager.currently_building_index: ", self.buildingmanager.currently_building_index)
-                # if index != self.buildingmanager.currently_building_index:
-                #     turn_amount += self.buildingmanager.buildings_dict.get(building)
-                # elif len(self.queuemanager.building_queue) == 1:
-                #     turn_amount += self.buildingmanager.buildings_dict.get(building)
-                # else:
-                #     turn_amount += self.turns_left_current_building
         else:
             self.turns_left_current_building = 0
         print("self.turns_left_current_building: ", self.turns_left_current_building)
         self.turns_left_current_buildingStringVar.set(
             "Turns left for\ncurrent building: %s" % self.turns_left_current_building)
-        # self.set_turns_left_building_queue()
 
 
+    # Method for decreasing the turns in the building queue and current building.
     def decrease_building_queue_turns(self):
         if self.turns_left_building_queue > 1:
             self.turns_left_building_queue -= 1
@@ -298,7 +286,6 @@ class TurnManager():
             self.buildingmanager.add_built()
             if not self.queuemanager.building_queue:
                 self.turns_left_current_building = 0
-            # self.turns_left_current_buildingStringVar.set("Built %s" % self.buildingmanager.currently_building)
 
 
     def increase_game_turns(self):
@@ -364,7 +351,6 @@ class BuildingManager():
         self.air_purifiers_number = 0
         self.houses_number = 0
         self.buildings_names = ""
-        self.currently_building = ""
         self.previous_building = ""
         self.buildings_list = sorted(["Air purifier", "Water purifier", "House", "Robot factory"])
         # Defining which buildings that can be built and how many turns they take to build.
@@ -437,7 +423,6 @@ class BuildingManager():
 
 
     def set_building_construction(self):
-
         if self.get_currently_building():
             if self.queuemanager.building_queue:
                 self.building_buildingStringVar.set("Building %s" % self.get_currently_building())
@@ -463,7 +448,6 @@ class BuildingManager():
 
     # This defines what happens when finishing building something.
     def add_built(self):
-        print("self.get_currently_building() in add_built: ", self.get_currently_building())
         self.set_previous_building()
         if self.previous_building:
             self.built_buildingStringVar.set("Built %s" % self.previous_building)
