@@ -75,12 +75,10 @@ class GUI(Frame):
 
     # Communication function between this GUI class and the GameLogic class.
     def add_buildings(self, buildingsListbox):
-        print("buildingsListbox.curselection() in GUI.add_buildings: ", self.buildingsListbox.curselection())
         self.buildingmanager.add_buildings(self.buildingsListbox)
 
 
     def set_building_description(self, buildingsListbox):
-        print("buildingsListbox.curselection() in GUI.set_building_description: ", self.buildingsListbox.curselection())
         self.buildingmanager.set_building_description(self.buildingsListbox)
 
 
@@ -146,7 +144,9 @@ class GUI(Frame):
 
         # Binding actions to elements.
         # Double-1 means double left click.
-        self.buildingsListbox.bind("<1>", self.set_building_description)
+        # self.buildingsListbox.select_set(first="active")
+        # self.buildingsListbox.activate(self.buildingsListbox.nearest(y=0))
+        self.buildingsListbox.bind("<<ListboxSelect>>", self.set_building_description)
         self.buildingsListbox.bind("<Double-1>", self.add_buildings)
         self.building_queueListbox.bind("<Double-1>", self.remove_from_building_queue)
 
@@ -346,6 +346,21 @@ class QueueManager():
 
 
 
+class Building():
+    def __init__(self, name, turns):
+        self.name = name
+        self.turns = turns
+
+
+    def get_name(self):
+        return self.name
+
+
+    def get_turns(self):
+        return self.turns
+
+
+
 class BuildingManager():
     def __init__(self):
         self.air_purifiers_number = 0
@@ -393,21 +408,32 @@ class BuildingManager():
         # self.houses_numberStringVar.set(buildings_names_filtered)
 
 
+    def set_buildings_attributes(self):
+        air_purifier = Building("Air purifier", 4)
+        house = Building("House", 5)
+        robot_factory = Building("Robot factory", 7)
+        water_purifier = Building("Water purifier", 4)
+
+        print(air_purifier.get_name(), air_purifier.get_turns())
+
+
     def set_building_description(self, buildingsListbox):
-        print("buildingsListbox in BuildingManager.set_building_description: ", buildingsListbox)
         selection = buildingsListbox.curselection()
-        print("selection in set_building_description: ", selection)
         if selection:
             selection_id = int(selection[0])
             print("selection_id in set_building_description: ", selection_id)
-            if selection_id == 1:
+            if selection_id == 0:
+                self.building_descriptionStringVar.set("Test1")
+            elif selection_id == 1:
                 self.building_descriptionStringVar.set("Test2")
+            else:
+                self.building_descriptionStringVar.set("")
         # pass
 
 
     def get_currently_building(self):
         if self.queuemanager.building_queue:
-            print("self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1] in get_currently_building: ", self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1])
+            # print("self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1] in get_currently_building: ", self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1])
             return self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1]
 
 

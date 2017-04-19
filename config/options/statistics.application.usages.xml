@@ -3,7 +3,7 @@
     <counts>
       <entry feature="AbstractNewProjectStep.Pure Python" count="1" />
       <entry feature="StripeButton[Version Control].shown" count="2" />
-      <entry feature="execute.PythonConfigurationType.Run" count="31" />
+      <entry feature="execute.PythonConfigurationType.Run" count="87" />
       <entry feature="ide.settings.General" count="1" />
       <entry feature="ide.settings.Keymap" count="2" />
       <entry feature="ide.settings.Project_Interpreter" count="1" />
