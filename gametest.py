@@ -435,10 +435,15 @@ class BuildingManager():
         if self.queuemanager.building_queue:
             # print("self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1] in get_currently_building: ", self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1])
             return self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1]
+        else:
+            return None
 
 
     def get_currently_building_index(self):
-        return len(self.queuemanager.building_queue) - 1
+        if self.queuemanager.building_queue:
+            return len(self.queuemanager.building_queue) - 1
+        else:
+            return None
 
 
     def set_previous_building(self):
