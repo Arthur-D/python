@@ -136,8 +136,10 @@ class GUI(Frame):
         building_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.building_buildingStringVar)
         built_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.built_buildingStringVar)
 
-        housesLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.houses_numberStringVar)
-        air_purifierLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.air_purifiers_numberStringVar)
+        air_purifier_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.air_purifier_amountStringVar)
+        house_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.house_amountStringVar)
+        robot_factory_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.robot_factory_amountStringVar)
+
         turnLabel = ttk.Label(self, textvariable = self.turnmanager.turn_numberStringVar)
         building_queueLabel = ttk.Label(self, text = "Building queue")
         #building_queueStringVar.set(self.building_queue)
@@ -167,8 +169,11 @@ class GUI(Frame):
         buildingsLabelframe.grid(row = 1, column = 8, sticky = W)
         built_buildingLabel.grid(row = 2, column = 8, sticky = W)
         building_descriptionLabel.grid(row = 1, column = 1, sticky = NW)
-        housesLabel.grid(row = 2, column = 8, sticky = W)
-        air_purifierLabel.grid(row = 1, column = 8, sticky = W)
+
+        air_purifier_amountLabel.grid(row = 1, column = 8, sticky = W)
+        house_amountLabel.grid(row=2, column=8, sticky=W)
+        robot_factory_amountLabel.grid(row = 3, column = 8, sticky = W)
+
         turnLabel.grid(row = 0, column = 8, sticky = E)
         self.saved_nameLabel.grid(row = 8, column = 0, sticky = W)
         self.error_playernameLabel.grid(row = 8, column = 0, sticky = W)
@@ -258,6 +263,7 @@ class TurnManager():
     def set_turns_left_current_building(self):
         print(self.queuemanager.building_queue)
         if self.queuemanager.building_queue:
+            # self.turns_left_current_building = self.buildingmanager.building_object[self.buildingmanager.get_currently_building_index()].get_turns()
             self.turns_left_current_building = self.buildingmanager.buildings_dict[self.buildingmanager.get_currently_building()]
         else:
             self.turns_left_current_building = 0
@@ -363,11 +369,12 @@ class Building():
 
 class BuildingManager():
     def __init__(self):
-        self.air_purifiers_number = 0
-        self.houses_number = 0
+        self.air_purifier_amount = 0
+        self.house_amount = 0
+        self.robot_factory_amount = 0
+
         self.buildings_names = ""
         self.previous_building = ""
-        self.buildings_list = sorted(["Air purifier", "Water purifier", "House", "Robot factory"])
         # Defining which buildings that can be built and how many turns they take to build.
         self.buildings_dict = {
             "Air purifier" : 4,
@@ -375,15 +382,20 @@ class BuildingManager():
             "House" : 5,
             "Robot factory" : 7
             }
+        self.buildings_unsorted_list = [key for key in self.buildings_dict]
+        self.buildings_list = sorted(self.buildings_unsorted_list)
 
         self.buildingsStringVar = StringVar()
         self.building_descriptionStringVar = StringVar()
         self.building_buildingStringVar = StringVar()
         self.built_buildingStringVar = StringVar()
-        self.air_purifiers_numberStringVar = StringVar()
-        self.houses_numberStringVar = StringVar()
+        self.air_purifier_amountStringVar = StringVar()
+        self.house_amountStringVar = StringVar()
+        self.robot_factory_amountStringVar = StringVar()
 
         self.set_buildings()
+        self.set_building_amountStringVars()        
+        # self.set_buildings_attributes()
 
 
     def set_turnmanager(self, turnmanager):
@@ -399,8 +411,7 @@ class BuildingManager():
         for name in self.buildings_list:
             self.buildings_names += "{%s}\n" % (name)
         self.buildingsStringVar.set(self.buildings_names)
-        self.air_purifiers_numberStringVar.set("Air purifiers: %s" % self.air_purifiers_number)
-        self.houses_numberStringVar.set("Houses: %s" % self.houses_number)
+
         # chars_to_remove = ["{", "'", "}"]
         # self.houses_numberStringVar.set(self.buildings_dict)
         # buildings_names_filtered = ''.join([char for char in self.houses_numberStringVar.get() if char not in chars_to_remove])
@@ -408,13 +419,19 @@ class BuildingManager():
         # self.houses_numberStringVar.set(buildings_names_filtered)
 
 
-    def set_buildings_attributes(self):
-        air_purifier = Building("Air purifier", 4)
-        house = Building("House", 5)
-        robot_factory = Building("Robot factory", 7)
-        water_purifier = Building("Water purifier", 4)
-
-        print(air_purifier.get_name(), air_purifier.get_turns())
+    # def set_buildings_attributes(self):
+    #     self.air_purifier = Building("Air purifier", 4)
+    #     self.house = Building("House", 5)
+    #     self.robot_factory = Building("Robot factory", 7)
+    #     self.water_purifier = Building("Water purifier", 4)
+    #
+    #     self.building_object = [self.air_purifier, self.house, self.robot_factory, self.water_purifier]
+    #     self.buildings_list = sorted([object.get_name() for object in self.building_object ])
+    #     print("self.house.get_turns() in BuildingManager.set_buildings_attributes: ", self.house.get_turns())
+    #     buildings_names = ""
+    #     for name in self.buildings_list:
+    #         buildings_names += "{%s}\n" % (name)
+    #     self.buildingsStringVar.set(buildings_names)
 
 
     def set_building_description(self, buildingsListbox):
@@ -431,6 +448,12 @@ class BuildingManager():
         # pass
 
 
+    def set_building_amountStringVars(self):
+        self.air_purifier_amountStringVar.set("Air purifiers: %s" % self.air_purifier_amount)
+        self.house_amountStringVar.set("Houses: %s" % self.house_amount)
+        self.robot_factory_amountStringVar.set("Robot factories: %s" % self.robot_factory_amount)
+
+
     def get_currently_building(self):
         if self.queuemanager.building_queue:
             # print("self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1] in get_currently_building: ", self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1])
@@ -440,10 +463,7 @@ class BuildingManager():
 
 
     def get_currently_building_index(self):
-        if self.queuemanager.building_queue:
             return len(self.queuemanager.building_queue) - 1
-        else:
-            return None
 
 
     def set_previous_building(self):
@@ -451,6 +471,18 @@ class BuildingManager():
             self.previous_building = self.get_currently_building()
         else:
             self.previous_building = None
+
+
+    def set_building_amounts(self):
+        if self.get_currently_building() == "Air purifier":
+            self.air_purifier_amount += 1
+        elif self.get_currently_building() == "House":
+            self.house_amount += 1
+        elif self.get_currently_building() == "Robot factory":
+            self.robot_factory_amount += 1
+        else:
+            print("No building to increase!")
+        self.set_building_amountStringVars()
 
 
     def set_building_construction(self):
@@ -482,14 +514,7 @@ class BuildingManager():
         self.set_previous_building()
         if self.previous_building:
             self.built_buildingStringVar.set("Built %s" % self.previous_building)
-        if self.get_currently_building() == "House":
-            self.houses_number += 1
-            self.houses_numberStringVar.set("Houses: %s" % self.houses_number)
-        elif self.get_currently_building() == "Air purifier":
-            self.air_purifiers_number += 1
-            self.air_purifiers_numberStringVar.set("Air purifiers: %s" % self.air_purifiers_number)
-        else:
-            print("No building to increase!")
+        self.set_building_amounts()
         self.queuemanager.remove_from_building_queue()
         self.set_building_construction()
         self.turnmanager.set_turns_left_current_building()
