@@ -416,18 +416,18 @@ class BuildingManager():
         # print("self.house.get_turns() in BuildingManager.set_buildings_attributes: ", self.house.get_turns())
 
 
-    def get_building_properties(name):
+    def get_building_properties(self, name):
         for building in self.building_properties:
             if building["Name"] == name:
                 return building
-            else:
-                return None
+            return None
 
 
     # Populate the list of built buildings with building names in self.buildings_list.
     def set_building_names(self):
-        for name in self.get_building_properties():
-            self.buildings_names += "{%s}\n" % (name)
+        for name in self.building_properties:
+            if self.building_properties["Name"] == name:
+                self.buildings_names += "{%s}\n" % (name)
         self.buildingsStringVar.set(self.buildings_names)
 
         # chars_to_remove = ["{", "'", "}"]
