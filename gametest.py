@@ -382,8 +382,8 @@ class BuildingManager():
             "House" : 5,
             "Robot factory" : 7
             }
-        self.buildings_unsorted_list = [key for key in self.buildings_dict]
-        self.buildings_list = sorted(self.buildings_unsorted_list)
+        # self.buildings_unsorted_list = [key for key in self.buildings_dict]
+        # self.buildings_list = sorted(self.buildings_unsorted_list)
 
         self.buildingsStringVar = StringVar()
         self.building_descriptionStringVar = StringVar()
@@ -393,8 +393,9 @@ class BuildingManager():
         self.house_amountStringVar = StringVar()
         self.robot_factory_amountStringVar = StringVar()
 
-        self.set_buildings()
-        self.set_building_amountStringVars()        
+        self.set_building_properties()
+        self.set_building_names()
+        self.set_building_amountStringVars()
         # self.set_buildings_attributes()
 
 
@@ -406,9 +407,26 @@ class BuildingManager():
         self.queuemanager = queuemanager
 
 
+    def set_building_properties(self):
+        self.building_properties = [{"Name" : "Air purifier", "Turn amount" : 4}, {"Name" : "House", "Turn amount" : 5}, {"Name" : "Robot factory", "Turn amount" : 7}, {"Name" : "Water purifier", "Turn amount" : 4}]
+        self.set_building_names()
+
+        # self.building_object = [self.air_purifier, self.house, self.robot_factory, self.water_purifier]
+        # self.buildings_list = sorted(key for key in self.building_properties if ""])
+        # print("self.house.get_turns() in BuildingManager.set_buildings_attributes: ", self.house.get_turns())
+
+
+    def get_building_properties(name):
+        for building in self.building_properties:
+            if building["Name"] == name:
+                return building
+            else:
+                return None
+
+
     # Populate the list of built buildings with building names in self.buildings_list.
-    def set_buildings(self):
-        for name in self.buildings_list:
+    def set_building_names(self):
+        for name in self.get_building_properties():
             self.buildings_names += "{%s}\n" % (name)
         self.buildingsStringVar.set(self.buildings_names)
 
@@ -417,21 +435,6 @@ class BuildingManager():
         # buildings_names_filtered = ''.join([char for char in self.houses_numberStringVar.get() if char not in chars_to_remove])
         # buildings_names_filtered = buildings_names_filtered.replace(",", "\n")
         # self.houses_numberStringVar.set(buildings_names_filtered)
-
-
-    # def set_buildings_attributes(self):
-    #     self.air_purifier = Building("Air purifier", 4)
-    #     self.house = Building("House", 5)
-    #     self.robot_factory = Building("Robot factory", 7)
-    #     self.water_purifier = Building("Water purifier", 4)
-    #
-    #     self.building_object = [self.air_purifier, self.house, self.robot_factory, self.water_purifier]
-    #     self.buildings_list = sorted([object.get_name() for object in self.building_object ])
-    #     print("self.house.get_turns() in BuildingManager.set_buildings_attributes: ", self.house.get_turns())
-    #     buildings_names = ""
-    #     for name in self.buildings_list:
-    #         buildings_names += "{%s}\n" % (name)
-    #     self.buildingsStringVar.set(buildings_names)
 
 
     def set_building_description(self, buildingsListbox):
