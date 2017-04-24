@@ -317,7 +317,7 @@ class QueueManager():
 
 
     def add_to_building_queue(self, selection_id):
-        self.building_queue.insert(0, "%s" % (self.buildingmanager.buildings_list[selection_id]))
+        self.building_queue.insert(0, "%s" % (self.buildingmanager.buildings_names[selection_id]))
         print("Building queue: ", self.building_queue)
         self.building_queueStringVar.set(self.building_queue)
 
@@ -353,9 +353,9 @@ class QueueManager():
 
 
 class Building():
-    def __init__(self, name, turns):
-        self.name = name
-        self.turns = turns
+    def __init__(self, properties):
+        self.name = properties["Name"]
+        self.turns = properties["Turn amount"]
 
 
     def get_name(self):
@@ -394,7 +394,6 @@ class BuildingManager():
         self.robot_factory_amountStringVar = StringVar()
 
         self.set_building_properties()
-        self.set_building_names()
         self.set_building_amountStringVars()
         # self.set_buildings_attributes()
 
@@ -425,9 +424,8 @@ class BuildingManager():
 
     # Populate the list of built buildings with building names in self.buildings_list.
     def set_building_names(self):
-        for name in self.building_properties:
-            if self.building_properties["Name"] == name:
-                self.buildings_names += "{%s}\n" % (name)
+        for building_property in self.building_properties:
+            self.buildings_names += "{%s}\n" % (building_property["Name"])
         self.buildingsStringVar.set(self.buildings_names)
 
         # chars_to_remove = ["{", "'", "}"]
