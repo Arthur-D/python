@@ -376,12 +376,12 @@ class BuildingManager():
         self.buildings_names = ""
         self.previous_building = ""
         # Defining which buildings that can be built and how many turns they take to build.
-        self.buildings_dict = {
-            "Air purifier" : 4,
-            "Water purifier" : 4,
-            "House" : 5,
-            "Robot factory" : 7
-            }
+        # self.buildings_dict = {
+        #     "Air purifier" : 4,
+        #     "Water purifier" : 4,
+        #     "House" : 5,
+        #     "Robot factory" : 7
+        #     }
         # self.buildings_unsorted_list = [key for key in self.buildings_dict]
         # self.buildings_list = sorted(self.buildings_unsorted_list)
 
@@ -410,8 +410,15 @@ class BuildingManager():
         self.building_properties = [{"Name" : "Air purifier", "Turn amount" : 4}, {"Name" : "House", "Turn amount" : 5}, {"Name" : "Robot factory", "Turn amount" : 7}, {"Name" : "Water purifier", "Turn amount" : 4}]
         self.set_building_names()
 
-        # self.building_object = [self.air_purifier, self.house, self.robot_factory, self.water_purifier]
-        # self.buildings_list = sorted(key for key in self.building_properties if ""])
+        self.air_purifier = Building(properties=self.building_properties[0])
+        self.house = Building(properties=self.building_properties[1])
+        self.robot_factory = Building(properties=self.building_properties[2])
+        self.water_purifier = Building(properties=self.building_properties[3])
+        print("self.water_purifier.get_name() in BuildingManager.set_building_properties: ", self.water_purifier.get_name())
+
+        self.building_objects = [self.air_purifier, self.house, self.robot_factory, self.water_purifier]
+        self.buildings_list = [key for key in self.building_objects]
+        print("self.buildings_list in BuildingManager.set_building_properties: ", self.buildings_list)
         # print("self.house.get_turns() in BuildingManager.set_buildings_attributes: ", self.house.get_turns())
 
 
@@ -420,6 +427,11 @@ class BuildingManager():
             if building["Name"] == name:
                 return building
             return None
+
+
+    # def set_building_list(self):
+    #     air_purifier = Building(self.na)
+    #     self.building_list = []
 
 
     # Populate the list of built buildings with building names in self.buildings_list.
