@@ -249,11 +249,9 @@ class TurnManager():
     def decrease_building_turns(self):
         if self.queuemanager.building_queue:
             building = self.queuemanager.building_queue[self.buildingmanager.get_currently_building_index()]
-            # print("building in TurnManager.decrease_building_turns: ", building)
             building.decrease_turns()
             self.set_turns_left_current_building()
             self.set_turns_left_building_queue()
-            print("building.get_turns() in TurnManager.decrease_building_turns: ", building.get_turns())
             self.turns_left_current_buildingStringVar.set(
             "Turns left for\ncurrent building: %s" % building.get_turns())
             if building.get_turns() == 0:
@@ -264,13 +262,11 @@ class TurnManager():
     def set_turns_left_building_queue(self):
         turn_amount = 0
         for index, building in enumerate(self.queuemanager.building_queue):
-            print("Building index:", index, building)
             if index != self.buildingmanager.get_currently_building_index():
                 turn_amount += building.get_turns()
             else:
                 turn_amount += self.turns_left_current_building
         self.turns_left_building_queue = turn_amount
-        print("len(self.queuemanager.building_queue) in TurnManager.set_turns_left_building_queue: ", len(self.queuemanager.building_queue))
         if len(self.queuemanager.building_queue) > 0:
             self.turns_left_building_queueStringVar.set("Turns left: %s" % self.turns_left_building_queue)
         else:
@@ -282,7 +278,6 @@ class TurnManager():
     def set_turns_left_current_building(self):
         if self.queuemanager.building_queue:
             building = self.queuemanager.building_queue[self.buildingmanager.get_currently_building_index()]
-            print("building.get_turns() in TurnManager.set_turns_left_current_building: ", building.get_turns())
             self.turns_left_current_building = building.get_turns()
             self.turns_left_current_buildingStringVar.set(
             "Turns left for\ncurrent building: %s" % building.get_turns())
@@ -368,7 +363,6 @@ class QueueManager():
         else:
             selection_id = None
             print("No more buildings to remove. Building queue empty.")
-        print("len(selection) in delete_from_building_queue: ", len(selection))
         if len(selection) == 1:
             self.buildingmanager.set_building_construction()
         if selection_id == self.buildingmanager.get_currently_building_index() + 1:
@@ -407,15 +401,6 @@ class BuildingManager():
 
         self.buildings_names = ""
         self.previous_building = ""
-        # Defining which buildings that can be built and how many turns they take to build.
-        # self.buildings_dict = {
-        #     "Air purifier" : 4,
-        #     "Water purifier" : 4,
-        #     "House" : 5,
-        #     "Robot factory" : 7
-        #     }
-        # self.buildings_unsorted_list = [key for key in self.buildings_dict]
-        # self.buildings_list = sorted(self.buildings_unsorted_list)
 
         self.buildingsStringVar = StringVar()
         self.building_descriptionStringVar = StringVar()
@@ -427,7 +412,6 @@ class BuildingManager():
 
         self.set_building_properties()
         self.set_building_amountStringVars()
-        # self.set_buildings_attributes()
 
 
     def set_turnmanager(self, turnmanager):
@@ -442,18 +426,12 @@ class BuildingManager():
         self.building_properties = [{"Name" : "Air purifier", "Turn amount" : 4}, {"Name" : "House", "Turn amount" : 5}, {"Name" : "Robot factory", "Turn amount" : 7}, {"Name" : "Water purifier", "Turn amount" : 4}]
         self.set_building_names()
 
-        # print("index in enumerate(self.building_properties) in BuildingManager.set_building_properties: ", index in enumerate(self.building_properties))
-
         self.air_purifier = Building(properties=self.get_building_properties("Air purifier"))
         self.house = Building(properties=self.get_building_properties("House"))
         self.robot_factory = Building(properties=self.get_building_properties("Robot factory"))
         self.water_purifier = Building(properties=self.get_building_properties("Water purifier"))
-        print("self.house.get_turns() in BuildingManager.set_building_properties: ", self.house.get_turns())
-        # print("index and self.building_properties[index] in BuildingManager.set_building_properties: ", index, self.building_properties[index])
 
         self.building_objects = [self.air_purifier, self.house, self.robot_factory, self.water_purifier]
-        # self.buildings_list = [key for key in self.building_objects]
-        print("self.get_building_properties('House') in BuildingManager.set_building_properties: ", self.get_building_properties(name="House"))
 
 
     def get_building_properties(self, name):
@@ -465,11 +443,6 @@ class BuildingManager():
 
     def get_currently_building_object(self):
         print("self.get_building_properties(self.get_currently_building()) in BuildingManager.get_currently_building_object", self.get_building_properties(self.get_currently_building()))
-
-
-    # def set_building_list(self):
-    #     air_purifier = Building(self.na)
-    #     self.building_list = []
 
 
     # Populate the list of possible buildings to build in self.buildings_list.
@@ -496,7 +469,6 @@ class BuildingManager():
                 self.building_descriptionStringVar.set("Test2")
             else:
                 self.building_descriptionStringVar.set("")
-        # pass
 
 
     def set_building_amountStringVars(self):
@@ -507,10 +479,6 @@ class BuildingManager():
 
     def get_currently_building(self):
         if self.queuemanager.building_queue:
-            # print("self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1] in get_currently_building: ", self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1])
-            # return self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1]
-            print("print(self.get_building_properties(len(self.queuemanager.building_queue) - 1)): ", self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1])
-            print("print(self.get_building_properties(self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1]) in BuildingManager.get_currently_building: ", self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1])
             return self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1].get_name()
         else:
             return None
