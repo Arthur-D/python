@@ -44,7 +44,7 @@ class GUI(Frame):
         self.buildingsListbox = Listbox(self, height = 13, background = "white", listvariable = self.buildingmanager.buildingsStringVar)
 
         # Listing buildings in the building queue.
-        self.building_queueListbox = Listbox(self, height = 5, background = "white", listvariable = self.queuemanager.building_queueStringVar)
+        self.building_queueListbox = Listbox(self, height = 5, background = "white", selectmode = "browse", listvariable = self.queuemanager.building_queueStringVar)
         
         # A name entry widget which currently does not work correctly due to miscommunication between GUI and GameLogic.
         self.nameentry = ttk.Entry(self, textvariable = self.gamelogic.playernameStringVar)
@@ -89,6 +89,11 @@ class GUI(Frame):
     # Communication function between this class and the QueueManager class.
     def remove_from_building_queue(self, building_queueListbox):
         self.queuemanager.delete_from_building_queue(self.building_queueListbox)
+
+
+    # Communication function between this class and the QueueManager class.
+    def move_in_building_queue(self, building_queueListbox):
+        self.queuemanager.move_in_building_queue(self.building_queueListbox)
 
 
     # Communication function between this class and the GameLogic class. Does not currently work as intended (the saved name is not displayed).
@@ -163,6 +168,7 @@ class GUI(Frame):
         self.buildingsListbox.bind("<<ListboxSelect>>", self.set_building_description)
         self.buildingsListbox.bind("<Double-1>", self.add_buildings)
         self.building_queueListbox.bind("<Double-1>", self.remove_from_building_queue)
+        self.building_queueListbox.bind("<1>", self.move_in_building_queue)
 
         # Placement of UI elements on the grid.
         self.grid(sticky = N + S + W + E)
@@ -184,6 +190,29 @@ class GUI(Frame):
         built_buildingLabel.grid(row = 2, column = 8, sticky = W)
         house_amountLabel.grid(row = 2, column = 8, sticky = W)
 
+        # Row 3:
+        self.building_queueListbox.grid(row = 3, column = 0, sticky = W)
+        building_building_turnsLabel.grid(row = 3, column = 1, sticky = NW)
+        robot_factory_amountLabel.grid(row=3, column=8, sticky=W)
+
+        # Row 4:
+        building_buildingLabel.grid(row = 4, column = 0, sticky = W)
+
+        # Row 5:
+        # built_buildingLabel.grid(row = 5, column = 0, sticky = W)
+
+        # Row 6:
+        turns_left_building_queueLabel.grid(row = 6, column = 0, sticky = W)
+
+        # Row 7:
+        # turns_left_current_buildingLabel.grid(row = 7, column = 0, sticky = W)
+
+        # Row 8:
+        self.saved_nameLabel.grid(row = 8, column = 0, sticky = W)
+        self.error_playernameLabel.grid(row = 8, column = 0, sticky = W)
+        self.error_playernameLabel.grid_remove()
+
+        # Row 9:
         self.nameentry.grid(row = 9, column = 0, sticky = W)
         self.nameentry.focus()
         button1.grid(row = 9, column = 1)
@@ -191,23 +220,6 @@ class GUI(Frame):
         button3.grid(row = 9, column = 3)
         button4.grid(row = 9, column = 4)
         quitButton.grid(row = 9, column = 8, sticky = E)
-
-
-        building_building_turnsLabel.grid(row = 3, column = 1, sticky = NW)
-
-
-        robot_factory_amountLabel.grid(row = 3, column = 8, sticky = W)
-
-        self.saved_nameLabel.grid(row = 8, column = 0, sticky = W)
-        self.error_playernameLabel.grid(row = 8, column = 0, sticky = W)
-        self.error_playernameLabel.grid_remove()
-        self.building_queueListbox.grid(row = 3, column = 0, sticky = W)
-        building_buildingLabel.grid(row = 4, column = 0, sticky = W)
-        # built_buildingLabel.grid(row = 5, column = 0, sticky = W)
-        turns_left_building_queueLabel.grid(row = 6, column = 0, sticky = W)
-        # turns_left_current_buildingLabel.grid(row = 7, column = 0, sticky = W)
-        # emptylabel = ttk.Label(self, text = "test")
-        # emptylabel.grid(row = 2, column = 8)
 
 
 
@@ -307,7 +319,7 @@ class TurnManager():
 
 
     def increase_game_turns(self):
-        if self.turn < 50:
+        if self.turn < 100:
             self.turn += 1
             self.turn_numberStringVar.set("Turn %s" % self.turn)
             print("Turn", self.turn)
@@ -367,6 +379,20 @@ class QueueManager():
             self.turnmanager.set_turns_left_current_building()
         self.turnmanager.set_turns_left_building_queue()
         self.buildingmanager.set_building_building_turns()
+
+
+    def move_in_building_queue(self, building_queueListbox):
+        selection = building_queueListbox.curselection()
+        print("selection in QueueManager.move_in_building_queue: ", selection)
+        if selection:
+            selection_id = int(selection[0])
+            building = self.building_queue[selection_id]
+            self.building_queue.pop(selection_id)
+            self.building_queue.insert(selection_id - 1, building)
+            self.set_building_queue()
+            self.buildingmanager.set_building_building_turns()
+            building_queueListbox.selection_clear(selection_id)
+            print("building_queueListbox.selection_clear in QueueManager.move_in_building_queue: ", building_queueListbox.selection_includes(selection_id))
 
 
 
