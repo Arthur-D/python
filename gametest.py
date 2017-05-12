@@ -32,6 +32,7 @@ class GUI(Frame):
         self.style = ttk.Style()
         self.style.theme_use("default")
         #self.style.configure("TButton", padding = (0, 2, 0, 0), font = "TkFixedFont")
+        self.style.configure("building_turns.TLabel", font = "TkTextFont 10")
 
         self.initUI()
         self.gamelogic = gamelogic
@@ -96,24 +97,30 @@ class GUI(Frame):
         #time_leftMethod = time_left
         
         # Adding columns and padding space.
-        self.columnconfigure(0, pad = 2)
-        self.columnconfigure(1, pad = 4)
-        self.columnconfigure(2, pad = 4)
-        self.columnconfigure(3, pad = 4)
-        self.columnconfigure(4, pad = 4)
-        self.columnconfigure(5, pad = 4)
-        self.columnconfigure(6, pad = 4)
-        self.columnconfigure(7, pad = 4)
-        self.columnconfigure(8, pad = 0)
-        self.columnconfigure(9, pad = 4)
+        column_number = 0
+        # while column_number < 10:
+        #     self.columnconfigure(column_number, pad = 4)
+        #     print("column_number in GUI.UI_configuration: ", column_number)
+        #     column_number += 1
+
+        # self.columnconfigure(0, pad = 2)
+        # self.columnconfigure(1, pad = 4)
+        # self.columnconfigure(2, pad = 4)
+        # self.columnconfigure(3, pad = 4)
+        # self.columnconfigure(4, pad = 4)
+        # self.columnconfigure(5, pad = 4)
+        # self.columnconfigure(6, pad = 4)
+        # self.columnconfigure(7, pad = 4)
+        # self.columnconfigure(8, pad = 0)
+        # self.columnconfigure(9, pad = 4)
         # Adding rows and padding space.
-        self.rowconfigure(0, pad = 3)
-        self.rowconfigure(1, pad = 3)
-        self.rowconfigure(2, pad = 20)
-        self.rowconfigure(3, pad = 3)
-        self.rowconfigure(4, pad = 3)
-        self.rowconfigure(5, pad = 3)
-        self.rowconfigure(6, pad = 3)
+        # self.rowconfigure(0, pad = 3)
+        # self.rowconfigure(1, pad = 3)
+        # self.rowconfigure(2, pad = 20)
+        # self.rowconfigure(3, pad = 3)
+        # self.rowconfigure(4, pad = 3)
+        # self.rowconfigure(5, pad = 3)
+        # self.rowconfigure(6, pad = 3)
 
         
         # Creating UI elements and setting their parameters.
@@ -130,11 +137,12 @@ class GUI(Frame):
         resources = ttk.Labelframe(self, text = "Resources", labelanchor = "nw", width = 150, height = 100)
         buildingsLabelframe = ttk.Labelframe(self, text = "Buildings", labelanchor = "nw", width = 100, height = 200)
         building_descriptionLabel = ttk.Label(self, textvariable = self.buildingmanager.building_descriptionStringVar)
-        #time_leftLabel = Label(self, textvariable = time_leftStringVar)
         turns_left_building_queueLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_building_queueStringVar)
         turns_left_current_buildingLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_current_buildingStringVar)
         building_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.building_buildingStringVar)
         built_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.built_buildingStringVar)
+        building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", textvariable = self.buildingmanager.building_turnsStringVar)
+        building_building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", textvariable = self.buildingmanager.building_building_turnsStringVar, wraplength = 2, padding = 0)
 
         air_purifier_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.air_purifier_amountStringVar)
         house_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.house_amountStringVar)
@@ -168,7 +176,9 @@ class GUI(Frame):
         #resources.grid(row = 0, column = 8, sticky = W)
         buildingsLabelframe.grid(row = 1, column = 8, sticky = W)
         built_buildingLabel.grid(row = 2, column = 8, sticky = W)
-        building_descriptionLabel.grid(row = 1, column = 1, sticky = NW)
+        building_descriptionLabel.grid(row = 1, column = 2, sticky = NW)
+        building_turnsLabel.grid(row = 1, column = 1, sticky = NW)
+        building_building_turnsLabel.grid(row = 3, column = 1, sticky = NW)
 
         air_purifier_amountLabel.grid(row = 1, column = 8, sticky = W)
         house_amountLabel.grid(row=2, column=8, sticky=W)
@@ -180,11 +190,10 @@ class GUI(Frame):
         self.error_playernameLabel.grid_remove()
         building_queueLabel.grid(row = 2, column = 0, sticky = S)
         self.building_queueListbox.grid(row = 3, column = 0, sticky = W)
-        #time_leftLabel.grid(row = 2, column = 1, sticky = W)
         building_buildingLabel.grid(row = 4, column = 0, sticky = W)
         # built_buildingLabel.grid(row = 5, column = 0, sticky = W)
         turns_left_building_queueLabel.grid(row = 6, column = 0, sticky = W)
-        turns_left_current_buildingLabel.grid(row = 7, column = 0, sticky = W)
+        # turns_left_current_buildingLabel.grid(row = 7, column = 0, sticky = W)
         emptylabel = ttk.Label(self, text = "")
         emptylabel.grid(row = 2, column = 8)
 
@@ -209,7 +218,7 @@ class GameLogic():
     def run_simulation(self):
         self.turnmanager.increase_game_turns()
         self.turnmanager.decrease_building_turns()
-        # self.turnmanager.decrease_building_queue_turns()
+        self.buildingmanager.set_building_building_turns()
 
 
     # Logic for saving playername to labels in GUI.
@@ -268,10 +277,10 @@ class TurnManager():
                 turn_amount += self.turns_left_current_building
         self.turns_left_building_queue = turn_amount
         if len(self.queuemanager.building_queue) > 0:
-            self.turns_left_building_queueStringVar.set("Turns left: %s" % self.turns_left_building_queue)
+            self.turns_left_building_queueStringVar.set("Turns left for\nbuilding queue: %s" % self.turns_left_building_queue)
         else:
             self.turns_left_building_queueStringVar.set("")
-        print("Turns left: ", self.turns_left_building_queue)
+        print("Turns left for building queue: ", self.turns_left_building_queue)
 
 
     # Logic for displaying how many turns are left building the foremost building in the queue.
@@ -283,28 +292,6 @@ class TurnManager():
             "Turns left for\ncurrent building: %s" % building.get_turns())
         else:
             self.turns_left_current_buildingStringVar.set("")
-
-
-    # Method for decreasing the turns in the building queue and current building.
-    def decrease_building_queue_turns(self):
-        if self.turns_left_building_queue > 1:
-            self.turns_left_building_queue -= 1
-            self.turns_left_building_queueStringVar.set("Turns left: %s" % self.turns_left_building_queue)
-            print("Set turns left to", self.turns_left_building_queue)
-        else:
-            self.turns_left_building_queue = 0
-            self.turns_left_building_queueStringVar.set("Queue empty")
-            print("Set turns left to 0")
-        if self.turns_left_current_building > 1:
-            self.turns_left_current_building -= 1
-            self.turns_left_current_buildingStringVar.set(
-                "Turns left for\ncurrent building: %s" % self.turns_left_current_building)
-            print("Turns left for current building: ", self.turns_left_current_building)
-        else:
-            print(self.queuemanager.building_queue)
-            self.buildingmanager.add_built()
-            if not self.queuemanager.building_queue:
-                self.turns_left_current_building = 0
 
 
     def increase_game_turns(self):
@@ -338,7 +325,6 @@ class QueueManager():
 
     def add_to_building_queue(self, selection_id):
         self.building_queue.insert(0, (Building(self.buildingmanager.building_properties[selection_id])))
-        print("Building queue: ", self.building_queue)
         self.set_building_queue()
 
 
@@ -368,6 +354,7 @@ class QueueManager():
         if selection_id == self.buildingmanager.get_currently_building_index() + 1:
             self.turnmanager.set_turns_left_current_building()
         self.turnmanager.set_turns_left_building_queue()
+        self.buildingmanager.set_building_building_turns()
 
 
 
@@ -400,18 +387,22 @@ class BuildingManager():
         self.robot_factory_amount = 0
 
         self.buildings_names = ""
+        self.building_turns = ""
         self.previous_building = ""
 
         self.buildingsStringVar = StringVar()
         self.building_descriptionStringVar = StringVar()
         self.building_buildingStringVar = StringVar()
+        self.building_building_turnsStringVar = StringVar()
         self.built_buildingStringVar = StringVar()
+        self.building_turnsStringVar = StringVar()
         self.air_purifier_amountStringVar = StringVar()
         self.house_amountStringVar = StringVar()
         self.robot_factory_amountStringVar = StringVar()
 
         self.set_building_properties()
         self.set_building_amountStringVars()
+        self.set_building_turns()
 
 
     def set_turnmanager(self, turnmanager):
@@ -458,11 +449,16 @@ class BuildingManager():
         # self.houses_numberStringVar.set(buildings_names_filtered)
 
 
+    def set_building_turns(self):
+        for building_property in self.building_properties:
+            self.building_turns += "%s\n" % (building_property["Turn amount"])
+        self.building_turnsStringVar.set(self.building_turns)
+
+
     def set_building_description(self, buildingsListbox):
         selection = buildingsListbox.curselection()
         if selection:
             selection_id = int(selection[0])
-            print("selection_id in set_building_description: ", selection_id)
             if selection_id == 0:
                 self.building_descriptionStringVar.set("Test1")
             elif selection_id == 1:
@@ -475,6 +471,13 @@ class BuildingManager():
         self.air_purifier_amountStringVar.set("Air purifiers: %s" % self.air_purifier_amount)
         self.house_amountStringVar.set("Houses: %s" % self.house_amount)
         self.robot_factory_amountStringVar.set("Robot factories: %s" % self.robot_factory_amount)
+
+
+    def set_building_building_turns(self):
+        building_building_turns = ""
+        for building in self.queuemanager.building_queue:
+            building_building_turns += "%s" % building.get_turns()
+        self.building_building_turnsStringVar.set(building_building_turns)
 
 
     def get_currently_building(self):
@@ -496,6 +499,10 @@ class BuildingManager():
 
 
     def set_building_amounts(self):
+        # self.building_amounts = [{ self.air_purifier_amountStringVar : "Air purifiers", self.house_amountStringVar : 0, self.robot_factory_amountStringVar : 0 }]
+        # for building in self.queuemanager.building_queue:
+        #     print("building in BuildingManager.set_building_amounts: ", building)
+        #     if building.get_name()
         if self.get_currently_building() == "Air purifier":
             self.air_purifier_amount += 1
         elif self.get_currently_building() == "House":
@@ -521,8 +528,8 @@ class BuildingManager():
     def add_buildings(self, buildingsListbox):
         selection = buildingsListbox.curselection()
         selection_id = int(selection[0])
-        print("selection_id in add_buildings: ", selection_id)
         self.queuemanager.add_to_building_queue(selection_id)
+        self.set_building_building_turns()
         if len(self.queuemanager.building_queue) == 1:
             self.turnmanager.set_turns_left_current_building()
         self.turnmanager.set_turns_left_building_queue()
@@ -539,6 +546,7 @@ class BuildingManager():
         self.set_building_construction()
         self.turnmanager.set_turns_left_current_building()
         self.turnmanager.set_turns_left_building_queue()
+        self.set_building_building_turns()
 
 
 
