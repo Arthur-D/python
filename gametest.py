@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 
-
+# The initializing function. Also contains references to setters in a specific order so as to make the various classes aware of each other.
 def main():
     root = Tk()
     gamelogic = GameLogic()
@@ -40,9 +40,10 @@ class GUI(Frame):
         self.queuemanager = queuemanager
         self.turnmanager = turnmanager
         
-        # List buildings you can build.
+        # Listing buildings you can build.
         self.buildingsListbox = Listbox(self, height = 13, background = "white", listvariable = self.buildingmanager.buildingsStringVar)
-        
+
+        # Listing buildings in the building queue.
         self.building_queueListbox = Listbox(self, height = 5, background = "white", listvariable = self.queuemanager.building_queueStringVar)
         
         # A name entry widget which currently does not work correctly due to miscommunication between GUI and GameLogic.
@@ -57,6 +58,7 @@ class GUI(Frame):
         self.UI_configuration()
 
 
+    # Function for creating the window context.
     def initUI(self):
         self.parent.title("Gametest")
         self.pack(fill = BOTH, expand = True)
@@ -74,20 +76,22 @@ class GUI(Frame):
         self.parent.geometry("%dx%d+%d+%d" % (w, h, x, y))
 
 
-    # Communication function between this GUI class and the GameLogic class.
+    # Communication function between this class and the BuildingManager class.
     def add_buildings(self, buildingsListbox):
         self.buildingmanager.add_buildings(self.buildingsListbox)
 
 
+    # Communication function between this class and the BuildingManager class.
     def set_building_description(self, buildingsListbox):
         self.buildingmanager.set_building_description(self.buildingsListbox)
 
 
+    # Communication function between this class and the QueueManager class.
     def remove_from_building_queue(self, building_queueListbox):
         self.queuemanager.delete_from_building_queue(self.building_queueListbox)
 
 
-    # Communication function between this GUI class and the GameLogic class. Does not currently work as intended (the saved name is not displayed).    
+    # Communication function between this class and the GameLogic class. Does not currently work as intended (the saved name is not displayed).
     def save_playername(self, saved_nameLabel, error_playernameLabel):
         self.gamelogic.save_playername(self.saved_nameLabel, self.error_playernameLabel)
 
@@ -141,8 +145,8 @@ class GUI(Frame):
         turns_left_current_buildingLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_current_buildingStringVar)
         building_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.building_buildingStringVar)
         built_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.built_buildingStringVar)
-        building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", textvariable = self.buildingmanager.building_turnsStringVar)
-        building_building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", textvariable = self.buildingmanager.building_building_turnsStringVar, wraplength = 2, padding = 0)
+        building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_turnsStringVar)
+        building_building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_building_turnsStringVar)
 
         air_purifier_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.air_purifier_amountStringVar)
         house_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.house_amountStringVar)
@@ -163,7 +167,23 @@ class GUI(Frame):
         # Placement of UI elements on the grid.
         self.grid(sticky = N + S + W + E)
 
+        # Row 0:
         add_buildingsLabel.grid(row = 0, column = 0, sticky = S)
+        turnLabel.grid(row = 0, column = 8, sticky = E)
+        #resources.grid(row = 0, column = 8, sticky = W)
+
+        # Row 1:
+        self.buildingsListbox.grid(row = 1, column = 0, sticky = W)
+        building_turnsLabel.grid(row = 1, column = 1, sticky = NW)
+        building_descriptionLabel.grid(row = 1, column = 2, sticky = NW)
+        buildingsLabelframe.grid(row = 1, column = 8, sticky = W)
+        air_purifier_amountLabel.grid(row = 1, column = 8, sticky = W)
+
+        # Row 2:
+        building_queueLabel.grid(row = 2, column = 0, sticky = S)
+        built_buildingLabel.grid(row = 2, column = 8, sticky = W)
+        house_amountLabel.grid(row = 2, column = 8, sticky = W)
+
         self.nameentry.grid(row = 9, column = 0, sticky = W)
         self.nameentry.focus()
         button1.grid(row = 9, column = 1)
@@ -172,30 +192,22 @@ class GUI(Frame):
         button4.grid(row = 9, column = 4)
         quitButton.grid(row = 9, column = 8, sticky = E)
 
-        self.buildingsListbox.grid(row = 1, column = 0, sticky = W)
-        #resources.grid(row = 0, column = 8, sticky = W)
-        buildingsLabelframe.grid(row = 1, column = 8, sticky = W)
-        built_buildingLabel.grid(row = 2, column = 8, sticky = W)
-        building_descriptionLabel.grid(row = 1, column = 2, sticky = NW)
-        building_turnsLabel.grid(row = 1, column = 1, sticky = NW)
+
         building_building_turnsLabel.grid(row = 3, column = 1, sticky = NW)
 
-        air_purifier_amountLabel.grid(row = 1, column = 8, sticky = W)
-        house_amountLabel.grid(row=2, column=8, sticky=W)
+
         robot_factory_amountLabel.grid(row = 3, column = 8, sticky = W)
 
-        turnLabel.grid(row = 0, column = 8, sticky = E)
         self.saved_nameLabel.grid(row = 8, column = 0, sticky = W)
         self.error_playernameLabel.grid(row = 8, column = 0, sticky = W)
         self.error_playernameLabel.grid_remove()
-        building_queueLabel.grid(row = 2, column = 0, sticky = S)
         self.building_queueListbox.grid(row = 3, column = 0, sticky = W)
         building_buildingLabel.grid(row = 4, column = 0, sticky = W)
         # built_buildingLabel.grid(row = 5, column = 0, sticky = W)
         turns_left_building_queueLabel.grid(row = 6, column = 0, sticky = W)
         # turns_left_current_buildingLabel.grid(row = 7, column = 0, sticky = W)
-        emptylabel = ttk.Label(self, text = "")
-        emptylabel.grid(row = 2, column = 8)
+        # emptylabel = ttk.Label(self, text = "test")
+        # emptylabel.grid(row = 2, column = 8)
 
 
 
@@ -451,7 +463,7 @@ class BuildingManager():
 
     def set_building_turns(self):
         for building_property in self.building_properties:
-            self.building_turns += "%s\n" % (building_property["Turn amount"])
+            self.building_turns += "%s" % (building_property["Turn amount"])
         self.building_turnsStringVar.set(self.building_turns)
 
 
