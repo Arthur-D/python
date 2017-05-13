@@ -57,7 +57,10 @@ class GUI(Frame):
         # Hidden label to display if an invalid name is entered in self.nameentry.
         self.error_playernameLabel = ttk.Label(self, foreground = "red", text = "Invalid name!")
         
-        self.UI_configuration()
+        self.set_UI_configuration()
+        self.set_UI_widgets()
+        self.set_widgets_on_grid()
+        self.set_widget_mouse_bindings()
 
 
     # Function for creating the window context.
@@ -103,8 +106,8 @@ class GUI(Frame):
         self.gamelogic.save_playername(self.saved_nameLabel, self.error_playernameLabel)
 
 
-    # Function with most of the widgets and their configuration.    
-    def UI_configuration(self):
+    # Function with widget configuration. Currently unused.
+    def set_UI_configuration(self):
         #time_leftMethod = time_left
         
         # Adding columns and padding space.
@@ -134,82 +137,76 @@ class GUI(Frame):
         # self.rowconfigure(6, pad = 3)
 
         
-        # Creating UI elements and setting their parameters.
-        
-        add_buildingsLabel = ttk.Label(self, text = "Add building")
+    # Creating UI elements and setting their parameters. Note: some widgets are in the constructor __init__().
+    def set_UI_widgets(self):
         # Creating main buttons.
-        button1 = ttk.Button(self, text = "Save name", command = self.save_playername)
-        button2 = ttk.Button(self, text = "Button 2")
-        button3 = ttk.Button(self, text = "Build house", command = self.buildingmanager.add_buildings)
-        button4 = ttk.Button(self, text = "End turn", command = self.gamelogic.run_simulation)
-        quitButton = ttk.Button(self, text = "Quit", command = self.quit)
+        self.button1 = ttk.Button(self, text = "Save name", command = self.save_playername)
+        self.button2 = ttk.Button(self, text = "Button 2")
+        self.button3 = ttk.Button(self, text = "Build house", command = self.buildingmanager.add_buildings)
+        self.button4 = ttk.Button(self, text = "End turn", command = self.gamelogic.run_simulation)
+        self.quitButton = ttk.Button(self, text = "Quit", command = self.quit)
 
-        resources = ttk.Labelframe(self, text = "Resources", labelanchor = "nw", width = 150, height = 100)
-        buildingsLabelframe = ttk.Labelframe(self, text = "Buildings", labelanchor = "nw", width = 100, height = 200)
-        building_descriptionLabel = ttk.Label(self, textvariable = self.buildingmanager.building_descriptionStringVar)
-        turns_left_building_queueLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_building_queueStringVar)
-        turns_left_current_buildingLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_current_buildingStringVar)
-        building_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.building_buildingStringVar)
-        built_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.built_buildingStringVar)
-        building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_turnsStringVar)
-        building_building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_building_turnsStringVar)
+        # Creating labels.
+        self.add_buildingsLabel = ttk.Label(self, text = "Add building")
+        self.turnLabel = ttk.Label(self, textvariable = self.turnmanager.turn_numberStringVar)
+        self.building_queueLabel = ttk.Label(self, text = "Building queue")
+        self.building_descriptionLabel = ttk.Label(self, textvariable = self.buildingmanager.building_descriptionStringVar)
+        self.turns_left_building_queueLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_building_queueStringVar)
+        self.turns_left_current_buildingLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_current_buildingStringVar)
+        self.building_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.building_buildingStringVar)
+        self.built_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.built_buildingStringVar)
+        self.building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_turnsStringVar)
+        self.building_building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_building_turnsStringVar)
 
-        building_amountsLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.building_amountsStringVar)
-        air_purifier_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.air_purifier_amountStringVar)
-        house_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.house_amountStringVar)
-        robot_factory_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.robot_factory_amountStringVar)
-        water_purifier_amountLabel = ttk.Label(buildingsLabelframe, textvariable = self.buildingmanager.water_purifier_amountStringVar)
+        self.building_amountsLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.building_amountsStringVar)
+        self.air_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.air_purifier_amountStringVar)
+        self.house_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.house_amountStringVar)
+        self.robot_factory_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.robot_factory_amountStringVar)
+        self.water_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.water_purifier_amountStringVar)
 
-        turnLabel = ttk.Label(self, textvariable = self.turnmanager.turn_numberStringVar)
-        building_queueLabel = ttk.Label(self, text = "Building queue")
-        #building_queueStringVar.set(self.building_queue)
+        # Creating labelframes.
+        self.resources = ttk.Labelframe(self, text = "Resources", labelanchor = "nw", width = 150, height = 100)
+        self.buildingsLabelframe = ttk.Labelframe(self, text = "Buildings", labelanchor = "nw", width = 100, height = 200)
 
-        # Binding actions to elements.
-        # Double-1 means double left click.
-        # self.buildingsListbox.select_set(first="active")
-        # self.buildingsListbox.activate(self.buildingsListbox.nearest(y=0))
-        self.buildingsListbox.bind("<<ListboxSelect>>", self.set_building_description)
-        self.buildingsListbox.bind("<Double-1>", self.add_buildings)
-        self.building_queueListbox.bind("<Double-1>", self.remove_from_building_queue)
-        self.building_queueListbox.bind("<1>", self.move_in_building_queue)
 
-        # Placement of UI elements on the grid.
+    # Placement of UI elements on the grid.
+    def set_widgets_on_grid(self):
         self.grid(sticky = N + S + W + E)
 
         # Row 0:
-        add_buildingsLabel.grid(row = 0, column = 0, sticky = S)
-        turnLabel.grid(row = 0, column = 8, sticky = E)
+        self.add_buildingsLabel.grid(row = 0, column = 0, sticky = S)
+        self.turnLabel.grid(row = 0, column = 8, sticky = E)
         #resources.grid(row = 0, column = 8, sticky = W)
 
         # Row 1:
         self.buildingsListbox.grid(row = 1, column = 0, sticky = W)
-        building_turnsLabel.grid(row = 1, column = 1, sticky = NW)
-        building_descriptionLabel.grid(row = 1, column = 2, sticky = NW)
-        buildingsLabelframe.grid(row = 1, column = 8, sticky = W)
-        air_purifier_amountLabel.grid(row = 1, column = 8, sticky = W)
+        self.building_turnsLabel.grid(row = 1, column = 1, sticky = NW)
+        self.building_descriptionLabel.grid(row = 1, column = 2, sticky = NW)
+        self.buildingsLabelframe.grid(row = 1, column = 8, sticky = W)
+        self.air_purifier_amountLabel.grid(row = 1, column = 8, sticky = W)
 
         # Row 2:
-        building_queueLabel.grid(row = 2, column = 0, sticky = S)
-        built_buildingLabel.grid(row = 2, column = 8, sticky = W)
-        house_amountLabel.grid(row = 2, column = 8, sticky = W)
+        self.building_queueLabel.grid(row = 2, column = 0, sticky = S)
+        self.built_buildingLabel.grid(row = 2, column = 8, sticky = W)
+        self.house_amountLabel.grid(row = 2, column = 8, sticky = W)
 
         # Row 3:
         self.building_queueListbox.grid(row = 3, column = 0, sticky = W)
-        building_building_turnsLabel.grid(row = 3, column = 1, sticky = NW)
-        robot_factory_amountLabel.grid(row = 3, column= 8 , sticky = W)
+        self.building_building_turnsLabel.grid(row = 3, column = 1, sticky = NW)
+        self.robot_factory_amountLabel.grid(row = 3, column= 8 , sticky = W)
 
         # Row 4:
-        building_buildingLabel.grid(row = 4, column = 0, sticky = W)
-        water_purifier_amountLabel.grid(row = 4, column = 8, sticky = W)
+        self.building_buildingLabel.grid(row = 4, column = 0, sticky = W)
+        self.water_purifier_amountLabel.grid(row = 4, column = 8, sticky = W)
 
         # Row 5:
-        # built_buildingLabel.grid(row = 5, column = 0, sticky = W)
+        # self.built_buildingLabel.grid(row = 5, column = 0, sticky = W)
 
         # Row 6:
-        turns_left_building_queueLabel.grid(row = 6, column = 0, sticky = W)
+        self.turns_left_building_queueLabel.grid(row = 6, column = 0, sticky = W)
 
         # Row 7:
-        # turns_left_current_buildingLabel.grid(row = 7, column = 0, sticky = W)
+        # self.turns_left_current_buildingLabel.grid(row = 7, column = 0, sticky = W)
 
         # Row 8:
         self.saved_nameLabel.grid(row = 8, column = 0, sticky = W)
@@ -219,11 +216,22 @@ class GUI(Frame):
         # Row 9:
         self.nameentry.grid(row = 9, column = 0, sticky = W)
         self.nameentry.focus()
-        button1.grid(row = 9, column = 1)
-        button2.grid(row = 9, column = 2)
-        button3.grid(row = 9, column = 3)
-        button4.grid(row = 9, column = 4)
-        quitButton.grid(row = 9, column = 8, sticky = E)
+        self.button1.grid(row = 9, column = 1)
+        self.button2.grid(row = 9, column = 2)
+        self.button3.grid(row = 9, column = 3)
+        self.button4.grid(row = 9, column = 4)
+        self.quitButton.grid(row = 9, column = 8, sticky = E)
+
+
+    # Binding actions to elements.
+    # Double-1 means double left click.
+    def set_widget_mouse_bindings(self):
+        # self.buildingsListbox.select_set(first="active")
+        # self.buildingsListbox.activate(self.buildingsListbox.nearest(y=0))
+        self.buildingsListbox.bind("<<ListboxSelect>>", self.set_building_description)
+        self.buildingsListbox.bind("<Double-1>", self.add_buildings)
+        self.building_queueListbox.bind("<Double-1>", self.remove_from_building_queue)
+        self.building_queueListbox.bind("<3>", self.move_in_building_queue)
 
 
 
@@ -389,19 +397,18 @@ class QueueManager():
         self.buildingmanager.set_building_queue_turns()
 
 
-    # Makes it possible to move a building up in the queue.
+    # Makes it possible to move a building forward in the queue.
     def move_in_building_queue(self, building_queueListbox):
         selection = building_queueListbox.curselection()
-        # print("selection in QueueManager.move_in_building_queue: ", selection)
         if selection:
             selection_id = int(selection[0])
             building = self.building_queue[selection_id]
             self.building_queue.pop(selection_id)
-            self.building_queue.insert(selection_id - 1, building)
+            self.building_queue.insert(selection_id + 1, building)
+            building_queueListbox.selection_clear(selection_id)
+            building_queueListbox.selection_set(selection_id + 1)
             self.set_building_queue()
             self.buildingmanager.set_building_queue_turns()
-            # print("building_queueListbox.selection_includes in QueueManager.move_in_building_queue: ", building_queueListbox.selection_includes(selection_id))
-            # building_queueListbox.selection_clear(selection_id)
 
 
 
@@ -552,8 +559,7 @@ class BuildingManager():
 
     # For getting the index of the foremost building in the queue.
     def get_currently_building_index(self):
-        if self.queuemanager.building_queue:
-            return len(self.queuemanager.building_queue) - 1
+        return len(self.queuemanager.building_queue) - 1
 
 
     # Sets what the previous building in the queue were, for showing what has just finished building.
