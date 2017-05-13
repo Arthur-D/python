@@ -80,7 +80,7 @@ class GUI(Frame):
 
 
     # Communication function between this class and the GameLogic class. Does not currently work as intended (the saved name is not displayed).
-    def save_playername(self, saved_nameLabel, error_playernameLabel):
+    def save_playername(self):
         self.gamelogic.save_playername(self.saved_nameLabel, self.error_playernameLabel)
 
 
@@ -134,7 +134,6 @@ class GUI(Frame):
         self.building_queueLabel = ttk.Label(self, text = "Building queue")
         self.building_descriptionLabel = ttk.Label(self, textvariable = self.buildingmanager.building_descriptionStringVar)
         self.turns_left_building_queueLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_building_queueStringVar)
-        self.turns_left_current_buildingLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_current_buildingStringVar)
         self.building_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.building_buildingStringVar)
         self.built_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.built_buildingStringVar)
         self.building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_turnsStringVar)
@@ -184,7 +183,6 @@ class GUI(Frame):
         self.turns_left_building_queueLabel.grid(row = 6, column = 0, sticky = W)
 
         # Row 7:
-        # self.turns_left_current_buildingLabel.grid(row = 7, column = 0, sticky = W)
 
         # Row 8:
         self.saved_nameLabel.grid(row = 8, column = 0, sticky = W)

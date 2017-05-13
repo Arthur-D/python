@@ -97,7 +97,6 @@ class BuildingManager():
         for building_property in self.building_properties:
             self.buildings_names += "{%s}\n" % (building_property["Name"])
             self.buildings_names_list.append(building_property["Name"])
-        print("self.buildings_names_list in BuildingManager.set_building_names(): ", self.buildings_names_list)
         self.buildingsStringVar.set(self.buildings_names)
 
 
@@ -193,8 +192,6 @@ class BuildingManager():
         selection_id = int(selection[0])
         self.queuemanager.add_to_building_queue(selection_id)
         self.set_building_queue_turns()
-        if len(self.queuemanager.building_queue) == 1:
-            self.turnmanager.set_turns_left_current_building()
         self.turnmanager.set_turns_left_building_queue()
         self.set_building_construction()
 
@@ -207,6 +204,5 @@ class BuildingManager():
         self.set_building_amounts()
         self.queuemanager.remove_from_building_queue()
         self.set_building_construction()
-        self.turnmanager.set_turns_left_current_building()
         self.turnmanager.set_turns_left_building_queue()
         self.set_building_queue_turns()

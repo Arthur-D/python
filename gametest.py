@@ -55,7 +55,7 @@ class GameLogic():
         saving_name = str(self.playernameStringVar.get())
         if saving_name != "":
             saved_nameLabel.grid()
-            self.saved_playernameStringVar.set(saving_name)
+            self.saved_playernameStringVar.set("Welcome, %s" % saving_name)
             error_playernameLabel.grid_remove()
         else:
             error_playernameLabel.grid()
