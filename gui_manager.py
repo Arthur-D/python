@@ -5,7 +5,7 @@ from tkinter import ttk
 
 # Class containing the GUI definitions for tkinter and ttk.
 class GUI(Frame):
-    def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager):
+    def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager):
         # Creates the main frame and background color.
         Frame.__init__(self, parent, background = "#d9d9d9")
         self.parent = parent
@@ -19,6 +19,7 @@ class GUI(Frame):
         self.buildingmanager = buildingmanager
         self.queuemanager = queuemanager
         self.turnmanager = turnmanager
+        self.savemanager = savemanager
 
         # Listing buildings you can build.
         self.buildingsListbox = Listbox(self, height = 13, background = "white", listvariable = self.buildingmanager.buildingsStringVar)
@@ -26,8 +27,9 @@ class GUI(Frame):
         # Listing buildings in the building queue.
         self.building_queueListbox = Listbox(self, height = 5, background = "white", selectmode = "browse", listvariable = self.queuemanager.building_queueStringVar)
 
-        # A name entry widget which currently does not work correctly due to miscommunication between GUI and GameLogic.
+        # A name entry widget.
         self.nameentry = ttk.Entry(self, textvariable = self.gamelogic.playernameStringVar)
+        self.save_name = ttk.Entry(self, textvariable = self.gamelogic.save_nameStringVar)
 
         # Hidden label to display the name entered in self.nameentry.
         self.saved_nameLabel = ttk.Label(self, textvariable = self.gamelogic.saved_playernameStringVar)
@@ -35,10 +37,15 @@ class GUI(Frame):
         # Hidden label to display if an invalid name is entered in self.nameentry.
         self.error_playernameLabel = ttk.Label(self, foreground = "red", text = "Invalid name!")
 
+        # Creating comboboxes.
+        self.saved_gamesCombobox = ttk.Combobox(self, state = "readonly")
+        self.saved_gamesCombobox.set("Select saved game:")
+
         self.set_UI_configuration()
         self.set_UI_widgets()
         self.set_widgets_on_grid()
         self.set_widget_mouse_bindings()
+        self.set_saved_games(self.saved_gamesCombobox)
 
 
     # Function for creating the window context.
@@ -79,7 +86,23 @@ class GUI(Frame):
         self.queuemanager.move_in_building_queue(self.building_queueListbox)
 
 
-    # Communication function between this class and the GameLogic class. Does not currently work as intended (the saved name is not displayed).
+    def set_saved_games(self, saved_gamesCombobox):
+        self.gamelogic.set_saved_games(self.saved_gamesCombobox)
+
+
+    def select_saved_game(self, saved_gameCombobox):
+        self.gamelogic.select_saved_game(self.saved_gamesCombobox)
+
+
+    def save_game(self):
+        self.gamelogic.save_game(self.saved_gamesCombobox)
+
+
+    def load_game(self):
+        self.gamelogic.load_game(self.saved_gamesCombobox)
+
+
+    # Communication function between this class and the GameLogic class.
     def save_playername(self):
         self.gamelogic.save_playername(self.saved_nameLabel, self.error_playernameLabel)
 
@@ -119,8 +142,8 @@ class GUI(Frame):
     def set_UI_widgets(self):
         # Creating main buttons.
         self.button1 = ttk.Button(self, text = "Save name", command = self.save_playername)
-        self.button2 = ttk.Button(self, text = "Button 2")
-        self.button3 = ttk.Button(self, text = "Build house", command = self.buildingmanager.add_buildings)
+        self.button2 = ttk.Button(self, text = "Save game", command = self.save_game)
+        self.button3 = ttk.Button(self, text = "Load game", command = self.load_game)
         self.button4 = ttk.Button(self, text = "End turn", command = self.gamelogic.run_simulation)
         self.quitButton = ttk.Button(self, text = "Quit", command = self.quit)
 
@@ -140,7 +163,7 @@ class GUI(Frame):
         self.building_building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_building_turnsStringVar)
 
         self.building_amountsLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.building_amountsStringVar)
-        self.air_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.air_purifier_amountStringVar)
+        self.air_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.stringvarmanager.air_purifier_amountStringVar)
         self.house_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.house_amountStringVar)
         self.robot_factory_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.robot_factory_amountStringVar)
         self.water_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.water_purifier_amountStringVar)
@@ -192,11 +215,15 @@ class GUI(Frame):
         # Row 9:
         self.nameentry.grid(row = 9, column = 0, sticky = W)
         self.nameentry.focus()
+        self.save_name.grid(row = 9, column = 2, sticky = W)
         self.button1.grid(row = 9, column = 1)
-        self.button2.grid(row = 9, column = 2)
-        self.button3.grid(row = 9, column = 3)
-        self.button4.grid(row = 9, column = 4)
+        self.button2.grid(row = 9, column = 3)
+        self.button4.grid(row = 9, column = 6)
         self.quitButton.grid(row = 9, column = 8, sticky = E)
+
+        # Row 10:
+        self.saved_gamesCombobox.grid(row = 10, column = 0)
+        self.button3.grid(row = 10, column = 1)
 
 
     # Binding actions to elements. Double-1 means double left click.
@@ -207,3 +234,4 @@ class GUI(Frame):
         self.buildingsListbox.bind("<Double-1>", self.add_buildings)
         self.building_queueListbox.bind("<Double-1>", self.remove_from_building_queue)
         self.building_queueListbox.bind("<3>", self.move_in_building_queue)
+        self.saved_gamesCombobox.bind("<<ComboboxSelected>>", self.select_saved_game)

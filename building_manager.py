@@ -63,6 +63,10 @@ class BuildingManager():
         self.queuemanager = queuemanager
 
 
+    def set_stringvarmanager(self, stringvarmanager):
+        self.stringvarmanager = stringvarmanager
+
+
     # Sets initial properties for buildings and instanciates them.
     def set_building_properties(self):
         self.building_properties = [{"Name" : "Air purifier", "Turn amount" : 4}, {"Name" : "House", "Turn amount" : 5}, {"Name" : "Robot factory", "Turn amount" : 7}, {"Name" : "Water purifier", "Turn amount" : 4}]
@@ -126,7 +130,7 @@ class BuildingManager():
 
     # Sets the relevant StringVars for displaying how many buildings have been built.
     def set_building_amountStringVars(self):
-        self.air_purifier_amountStringVar.set("Air purifiers: %s" % self.air_purifier_amount)
+        self.stringvarmanager.air_purifier_amountStringVar.set("Air purifiers: %s" % self.air_purifier_amount)
         self.house_amountStringVar.set("Houses: %s" % self.house_amount)
         self.robot_factory_amountStringVar.set("Robot factories: %s" % self.robot_factory_amount)
         self.water_purifier_amountStringVar.set("Water purifiers: %s" % self.water_purifier_amount)
