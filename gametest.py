@@ -16,7 +16,7 @@ def main():
     stringvarmanager = StringVarManager()
     queuemanager = QueueManager()
     turnmanager = TurnManager()
-    buildingmanager = BuildingManager()
+    buildingmanager = BuildingManager(stringvarmanager)
     savemanager = SaveManager()
     # guimanager = GUI(Frame, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager)
 
@@ -31,12 +31,12 @@ def main():
     turnmanager.set_queuemanager(queuemanager)
     buildingmanager.set_turnmanager(turnmanager)
     buildingmanager.set_queuemanager(queuemanager)
-    buildingmanager.set_stringvarmanager(stringvarmanager)
+    # buildingmanager.set_stringvarmanager(stringvarmanager)
     savemanager.set_gamelogic(gamelogic)
     savemanager.set_buildingmanager(buildingmanager)
     savemanager.set_stringvarmanager(stringvarmanager)
 
-    app = GUI(root, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager)
+    app = GUI(root, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager, stringvarmanager)
     root.mainloop()
 
 

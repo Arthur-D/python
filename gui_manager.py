@@ -5,7 +5,7 @@ from tkinter import ttk
 
 # Class containing the GUI definitions for tkinter and ttk.
 class GUI(Frame):
-    def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager):
+    def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager, stringvarmanager):
         # Creates the main frame and background color.
         Frame.__init__(self, parent, background = "#d9d9d9")
         self.parent = parent
@@ -20,6 +20,7 @@ class GUI(Frame):
         self.queuemanager = queuemanager
         self.turnmanager = turnmanager
         self.savemanager = savemanager
+        self.stringvarmanager = stringvarmanager
 
         # Listing buildings you can build.
         self.buildingsListbox = Listbox(self, height = 13, background = "white", listvariable = self.buildingmanager.buildingsStringVar)

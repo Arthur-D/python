@@ -26,8 +26,8 @@ class Building():
 
 
 # Class for handling the buildings.
-class BuildingManager():
-    def __init__(self):
+class BuildingManager:
+    def __init__(self, stringvarmanager):
         self.air_purifier_amount = 0
         self.house_amount = 0
         self.robot_factory_amount = 0
@@ -50,6 +50,7 @@ class BuildingManager():
         self.robot_factory_amountStringVar = StringVar()
         self.water_purifier_amountStringVar = StringVar()
 
+        self.stringvarmanager = stringvarmanager
         self.set_building_properties()
         self.set_building_amountStringVars()
         self.set_building_turns()
@@ -61,10 +62,6 @@ class BuildingManager():
 
     def set_queuemanager(self, queuemanager):
         self.queuemanager = queuemanager
-
-
-    def set_stringvarmanager(self, stringvarmanager):
-        self.stringvarmanager = stringvarmanager
 
 
     # Sets initial properties for buildings and instanciates them.
