@@ -105,6 +105,7 @@ class GameLogic():
     def set_saved_games(self, saved_gamesCombobox):
         self.savemanager.set_saved_games()
         saved_gamesCombobox["values"] = self.savemanager.get_saved_games()
+        print("savemanager.get_saved_games() in GameLogic.set_saved_games(): ", self.savemanager.get_saved_games())
 
 
     def select_saved_game(self, saved_gamesCombobox):

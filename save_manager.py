@@ -7,7 +7,7 @@ from stringvar_manager import *
 
 class SaveManager:
     def __init__(self):
-        self.saved_gamesStringVar = StringVar()
+        self.saved_games = []
 
 
     def set_gamelogic(self, gamelogic):
@@ -23,8 +23,15 @@ class SaveManager:
 
 
     def set_saved_games(self):
-        self.saved_games = [filename[:-4] for filename in os.listdir("Saves/") if filename.endswith(".dat")]
-        # self.saved_gamesStringVar.set(self.saved_games)
+        if os.path.exists("Saves"):
+            for filename in os.listdir("Saves/"):
+                if filename not in self.saved_games:
+                    if filename.endswith(".dat"):
+                        self.saved_games.append(filename[:-4])
+                    else:
+                        self.saved_games.append(filename)
+        else:
+            print("No Saves directory found!")
 
 
     def get_saved_games(self):
@@ -37,8 +44,10 @@ class SaveManager:
         saveFile = shelve.open("Saves/%s" % save_name)
         # saveFile["SaveManager.saved_games"] = self.saved_games
         saveFile["BuildingManager.air_purifier_amount"] = self.buildingmanager.air_purifier_amount
+        print("self.buildingmanager.air_purifier_amountStringVar.get() in SaveManager.save_game_state(): ", self.buildingmanager.air_purifier_amountStringVar.get())
         saveFile["BuildingManager.air_purifier_amountStringVar"] = self.buildingmanager.air_purifier_amountStringVar.get()
         saveFile.close()
+        # self.set_saved_games()
 
 
     def load_game_state(self, save_name):

@@ -23,14 +23,14 @@ class GUI(Frame):
         self.stringvarmanager = stringvarmanager
 
         # Listing buildings you can build.
-        self.buildingsListbox = Listbox(self, height = 13, background = "white", listvariable = self.buildingmanager.buildingsStringVar)
+        self.buildingsListbox = Listbox(self, width = 16, height = 13, background = "white", listvariable = self.buildingmanager.buildingsStringVar)
 
         # Listing buildings in the building queue.
-        self.building_queueListbox = Listbox(self, height = 5, background = "white", selectmode = "browse", listvariable = self.queuemanager.building_queueStringVar)
+        self.building_queueListbox = Listbox(self, width = 16, height = 5, background = "white", selectmode = "browse", listvariable = self.queuemanager.building_queueStringVar)
 
         # A name entry widget.
-        self.nameentry = ttk.Entry(self, textvariable = self.gamelogic.playernameStringVar)
-        self.save_name = ttk.Entry(self, textvariable = self.gamelogic.save_nameStringVar)
+        self.nameentry = ttk.Entry(self, width = 16, textvariable = self.gamelogic.playernameStringVar)
+        self.save_name = ttk.Entry(self, width = 16, textvariable = self.gamelogic.save_nameStringVar)
 
         # Hidden label to display the name entered in self.nameentry.
         self.saved_nameLabel = ttk.Label(self, textvariable = self.gamelogic.saved_playernameStringVar)
@@ -39,7 +39,7 @@ class GUI(Frame):
         self.error_playernameLabel = ttk.Label(self, foreground = "red", text = "Invalid name!")
 
         # Creating comboboxes.
-        self.saved_gamesCombobox = ttk.Combobox(self, state = "readonly")
+        self.saved_gamesCombobox = ttk.Combobox(self, width = 15, state = "readonly")
         self.saved_gamesCombobox.set("Select saved game:")
 
         self.set_UI_configuration()

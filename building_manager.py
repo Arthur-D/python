@@ -127,7 +127,7 @@ class BuildingManager:
 
     # Sets the relevant StringVars for displaying how many buildings have been built.
     def set_building_amountStringVars(self):
-        self.stringvarmanager.air_purifier_amountStringVar.set("Air purifiers: %s" % self.air_purifier_amount)
+        self.stringvarmanager.set_air_purifier_amountStringVar("Air purifiers: %s" % self.air_purifier_amount)
         self.house_amountStringVar.set("Houses: %s" % self.house_amount)
         self.robot_factory_amountStringVar.set("Robot factories: %s" % self.robot_factory_amount)
         self.water_purifier_amountStringVar.set("Water purifiers: %s" % self.water_purifier_amount)
