@@ -1,7 +1,7 @@
 import shelve
 import os
 from tkinter import StringVar
-from stringvar_manager import *
+from state_manager import *
 
 
 
@@ -18,18 +18,22 @@ class SaveManager:
         self.buildingmanager = buildingmanager
 
 
-    def set_stringvarmanager(self, stringvarmanager):
-        self.stringvarmanager = stringvarmanager
+    def set_statemanager(self, statemanager):
+        self.statemanager = statemanager
 
 
     def set_saved_games(self):
         if os.path.exists("Saves"):
             for filename in os.listdir("Saves/"):
-                if filename not in self.saved_games:
-                    if filename.endswith(".dat"):
-                        self.saved_games.append(filename[:-4])
-                    else:
+                if filename in self.saved_games or filename[:-4] in self.saved_games:
+                    print("Skipping file ", filename)
+                else:
+                    if "." not in filename:
                         self.saved_games.append(filename)
+                        print("Adding %s to saved games list" % filename)
+                    else:
+                        self.saved_games.append(filename[:-4])
+                        print("Adding %s to saved games list" % filename[:-4])
         else:
             print("No Saves directory found!")
 
@@ -42,22 +46,25 @@ class SaveManager:
         if not os.path.exists("Saves"):
             os.mkdir("Saves")
         saveFile = shelve.open("Saves/%s" % save_name)
-        # saveFile["SaveManager.saved_games"] = self.saved_games
-        saveFile["BuildingManager.air_purifier_amount"] = self.buildingmanager.air_purifier_amount
-        print("self.buildingmanager.air_purifier_amountStringVar.get() in SaveManager.save_game_state(): ", self.buildingmanager.air_purifier_amountStringVar.get())
-        saveFile["BuildingManager.air_purifier_amountStringVar"] = self.buildingmanager.air_purifier_amountStringVar.get()
+        saveFile["StateManager.air_purifier_amount"] = self.statemanager.air_purifier_amount
+        saveFile["StateManager.house_amount"] = self.statemanager.house_amount
+        saveFile["StateManager.robot_factory_amount"] = self.statemanager.robot_factory_amount
+        saveFile["StateManager.water_purifier_amount"] = self.statemanager.water_purifier_amount
         saveFile.close()
-        # self.set_saved_games()
 
 
     def load_game_state(self, save_name):
         saveFile = shelve.open("Saves/%s" % save_name)
-        # self.saved_games = saveFile["SaveManager.saved_games"]
-        self.air_purifier_amount = saveFile["BuildingManager.air_purifier_amount"]
-        self.air_purifier_amountStringVar = saveFile["BuildingManager.air_purifier_amountStringVar"]
+        self.air_purifier_amount = saveFile["StateManager.air_purifier_amount"]
+        self.house_amount = saveFile["StateManager.house_amount"]
+        self.robot_factory_amount = saveFile["StateManager.robot_factory_amount"]
+        self.water_purifier_amount = saveFile["StateManager.water_purifier_amount"]
         saveFile.close()
 
 
     def set_game_state(self):
-        print("self.air_purifier_amountStringVar in SaveManager.set_game_state(): ", self.air_purifier_amountStringVar)
-        self.stringvarmanager.set_air_purifier_amountStringVar(self.air_purifier_amountStringVar)
+        self.statemanager.set_air_purifier_amount(self.air_purifier_amount)
+        self.statemanager.set_house_amount(self.house_amount)
+        self.statemanager.set_robot_factory_amount(self.robot_factory_amount)
+        self.statemanager.set_water_purifier_amount(self.water_purifier_amount)
+        self.statemanager.set_StringVars()

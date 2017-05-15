@@ -5,7 +5,7 @@ from tkinter import ttk
 from turn_manager import *
 from building_manager import *
 from save_manager import *
-from stringvar_manager import *
+from state_manager import *
 
 
 
@@ -13,10 +13,10 @@ from stringvar_manager import *
 def main():
     root = Tk()
     gamelogic = GameLogic()
-    stringvarmanager = StringVarManager()
+    statemanager = StateManager()
     queuemanager = QueueManager()
     turnmanager = TurnManager()
-    buildingmanager = BuildingManager(stringvarmanager)
+    buildingmanager = BuildingManager(statemanager)
     savemanager = SaveManager()
     # guimanager = GUI(Frame, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager)
 
@@ -24,19 +24,19 @@ def main():
     gamelogic.set_turnmanager(turnmanager)
     gamelogic.set_buildingmanager(buildingmanager)
     gamelogic.set_savemanager(savemanager)
-    gamelogic.set_stringvarmanager(stringvarmanager)
+    gamelogic.set_statemanager(statemanager)
     queuemanager.set_buildingmanager(buildingmanager)
     queuemanager.set_turnmanager(turnmanager)
     turnmanager.set_buildingmanager(buildingmanager)
     turnmanager.set_queuemanager(queuemanager)
     buildingmanager.set_turnmanager(turnmanager)
     buildingmanager.set_queuemanager(queuemanager)
-    # buildingmanager.set_stringvarmanager(stringvarmanager)
+    # buildingmanager.set_statemanager(statemanager)
     savemanager.set_gamelogic(gamelogic)
     savemanager.set_buildingmanager(buildingmanager)
-    savemanager.set_stringvarmanager(stringvarmanager)
+    savemanager.set_statemanager(statemanager)
 
-    app = GUI(root, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager, stringvarmanager)
+    app = GUI(root, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager, statemanager)
     root.mainloop()
 
 
@@ -68,8 +68,8 @@ class GameLogic():
         self.savemanager = savemanager
 
 
-    def set_stringvarmanager(self, stringvarmanager):
-        self.stringvarmanager = stringvarmanager
+    def set_statemanager(self, statemanager):
+        self.statemanager = statemanager
 
 
     # This defines what happens when clicking End turn.

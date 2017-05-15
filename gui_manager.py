@@ -5,7 +5,7 @@ from tkinter import ttk
 
 # Class containing the GUI definitions for tkinter and ttk.
 class GUI(Frame):
-    def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager, stringvarmanager):
+    def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager, statemanager):
         # Creates the main frame and background color.
         Frame.__init__(self, parent, background = "#d9d9d9")
         self.parent = parent
@@ -20,7 +20,7 @@ class GUI(Frame):
         self.queuemanager = queuemanager
         self.turnmanager = turnmanager
         self.savemanager = savemanager
-        self.stringvarmanager = stringvarmanager
+        self.statemanager = statemanager
 
         # Listing buildings you can build.
         self.buildingsListbox = Listbox(self, width = 16, height = 13, background = "white", listvariable = self.buildingmanager.buildingsStringVar)
@@ -46,6 +46,7 @@ class GUI(Frame):
         self.set_UI_widgets()
         self.set_widgets_on_grid()
         self.set_widget_mouse_bindings()
+        self.statemanager.set_StringVars()
         self.set_saved_games(self.saved_gamesCombobox)
 
 
@@ -164,10 +165,10 @@ class GUI(Frame):
         self.building_building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_building_turnsStringVar)
 
         self.building_amountsLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.building_amountsStringVar)
-        self.air_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.stringvarmanager.air_purifier_amountStringVar)
-        self.house_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.house_amountStringVar)
-        self.robot_factory_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.robot_factory_amountStringVar)
-        self.water_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.water_purifier_amountStringVar)
+        self.air_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.statemanager.air_purifier_amountStringVar)
+        self.house_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.statemanager.house_amountStringVar)
+        self.robot_factory_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.statemanager.robot_factory_amountStringVar)
+        self.water_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.statemanager.water_purifier_amountStringVar)
 
 
     # Placement of UI elements on the grid.

@@ -27,7 +27,7 @@ class Building():
 
 # Class for handling the buildings.
 class BuildingManager:
-    def __init__(self, stringvarmanager):
+    def __init__(self, statemanager):
         self.air_purifier_amount = 0
         self.house_amount = 0
         self.robot_factory_amount = 0
@@ -45,14 +45,9 @@ class BuildingManager:
         self.built_buildingStringVar = StringVar()
         self.building_amountsStringVar = StringVar()
         self.building_turnsStringVar = StringVar()
-        self.air_purifier_amountStringVar = StringVar()
-        self.house_amountStringVar = StringVar()
-        self.robot_factory_amountStringVar = StringVar()
-        self.water_purifier_amountStringVar = StringVar()
 
-        self.stringvarmanager = stringvarmanager
+        self.statemanager = statemanager
         self.set_building_properties()
-        self.set_building_amountStringVars()
         self.set_building_turns()
 
 
@@ -125,14 +120,6 @@ class BuildingManager:
                 self.building_descriptionStringVar.set("")
 
 
-    # Sets the relevant StringVars for displaying how many buildings have been built.
-    def set_building_amountStringVars(self):
-        self.stringvarmanager.set_air_purifier_amountStringVar("Air purifiers: %s" % self.air_purifier_amount)
-        self.house_amountStringVar.set("Houses: %s" % self.house_amount)
-        self.robot_factory_amountStringVar.set("Robot factories: %s" % self.robot_factory_amount)
-        self.water_purifier_amountStringVar.set("Water purifiers: %s" % self.water_purifier_amount)
-
-
     # Similar to set_buildings_list() but is for the buildings that are in the building queue.
     def set_building_queue_turns(self):
         building_queue_turns = ""
@@ -160,23 +147,19 @@ class BuildingManager:
             self.previous_building = None
 
 
-    # Sets how many finished buildings there are of each type.
+    # Increments how many finished buildings there are of each type.
     def set_building_amounts(self):
-        # self.building_amounts = [{ self.air_purifier_amountStringVar : "Air purifiers", self.house_amountStringVar : 0, self.robot_factory_amountStringVar : 0 }]
-        # for building in self.queuemanager.building_queue:
-        #     print("building in BuildingManager.set_building_amounts: ", building)
-        #     if building.get_name()
         if self.get_currently_building_name() == "Air purifier":
-            self.air_purifier_amount += 1
+            self.statemanager.set_air_purifier_amount(self.statemanager.air_purifier_amount + 1)
         elif self.get_currently_building_name() == "House":
-            self.house_amount += 1
+            self.statemanager.set_house_amount(self.statemanager.house_amount + 1)
         elif self.get_currently_building_name() == "Robot factory":
-            self.robot_factory_amount += 1
+            self.statemanager.set_robot_factory_amount(self.statemanager.robot_factory_amount + 1)
         elif self.get_currently_building_name() == "Water purifier":
-            self.water_purifier_amount += 1
+            self.statemanager.set_water_purifier_amount(self.statemanager.water_purifier_amount + 1)
         else:
             print("No building to increase!")
-        self.set_building_amountStringVars()
+        self.statemanager.set_StringVars()
 
 
     # Sets what building is currently being constructed for display purposes only.
