@@ -18,20 +18,21 @@ def main():
     turnmanager = TurnManager()
     buildingmanager = BuildingManager(statemanager)
     savemanager = SaveManager()
-    # guimanager = GUI(Frame, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager)
 
-    # gamelogic.set_guimanager(guimanager)
     gamelogic.set_turnmanager(turnmanager)
     gamelogic.set_buildingmanager(buildingmanager)
     gamelogic.set_savemanager(savemanager)
     gamelogic.set_statemanager(statemanager)
+
     queuemanager.set_buildingmanager(buildingmanager)
     queuemanager.set_turnmanager(turnmanager)
+
     turnmanager.set_buildingmanager(buildingmanager)
     turnmanager.set_queuemanager(queuemanager)
+
     buildingmanager.set_turnmanager(turnmanager)
     buildingmanager.set_queuemanager(queuemanager)
-    # buildingmanager.set_statemanager(statemanager)
+
     savemanager.set_gamelogic(gamelogic)
     savemanager.set_buildingmanager(buildingmanager)
     savemanager.set_statemanager(statemanager)
@@ -48,8 +49,6 @@ class GameLogic():
         self.saved_playernameStringVar = StringVar()
         self.save_nameStringVar = StringVar()
         self.save_nameStringVar.set("gametest_save")
-
-        # self.savemanager.set_saved_games()
 
 
     def set_guimanager(self, guimanager):
@@ -96,7 +95,6 @@ class GameLogic():
         if self.save_name != "":
             self.savemanager.save_game_state(self.save_name)
             print("Saving game as %s" % self.save_name)
-            self.savemanager.set_saved_games()
             self.set_saved_games(saved_gamesCombobox)
         else:
             print("Error saving game: name empty!")
@@ -121,7 +119,16 @@ class GameLogic():
             self.savemanager.load_game_state(save_game)
             self.savemanager.set_game_state()
             print("Loading save '%s'" % save_game)
-            # SaveManager.set_game_state(self)
+        else:
+            print("Select a save game!")
+
+
+    def delete_saved_game(self, saved_gamesCombobox):
+        selection = saved_gamesCombobox.current()
+        if selection > -1:
+            save_game = self.savemanager.saved_games[selection]
+            self.savemanager.delete_saved_game(save_game)
+            self.set_saved_games(saved_gamesCombobox)
         else:
             print("Select a save game!")
 

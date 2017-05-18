@@ -30,7 +30,7 @@ class GUI(Frame):
 
         # A name entry widget.
         self.nameentry = ttk.Entry(self, width = 16, textvariable = self.gamelogic.playernameStringVar)
-        self.save_name = ttk.Entry(self, width = 16, textvariable = self.gamelogic.save_nameStringVar)
+        self.save_gameEntry = ttk.Entry(self, width = 16, textvariable = self.gamelogic.save_nameStringVar)
 
         # Hidden label to display the name entered in self.nameentry.
         self.saved_nameLabel = ttk.Label(self, textvariable = self.gamelogic.saved_playernameStringVar)
@@ -40,7 +40,6 @@ class GUI(Frame):
 
         # Creating comboboxes.
         self.saved_gamesCombobox = ttk.Combobox(self, width = 15, state = "readonly")
-        self.saved_gamesCombobox.set("Select saved game:")
 
         self.set_UI_configuration()
         self.set_UI_widgets()
@@ -89,6 +88,7 @@ class GUI(Frame):
 
 
     def set_saved_games(self, saved_gamesCombobox):
+        self.saved_gamesCombobox.set("Select saved game")
         self.gamelogic.set_saved_games(self.saved_gamesCombobox)
 
 
@@ -102,6 +102,11 @@ class GUI(Frame):
 
     def load_game(self):
         self.gamelogic.load_game(self.saved_gamesCombobox)
+
+
+    def delete_saved_game(self):
+        self.gamelogic.delete_saved_game(self.saved_gamesCombobox)
+        self.saved_gamesCombobox.set("Select saved game")
 
 
     # Communication function between this class and the GameLogic class.
@@ -143,10 +148,11 @@ class GUI(Frame):
     # Creating UI elements and setting their parameters. Note: some widgets are in the constructor __init__().
     def set_UI_widgets(self):
         # Creating main buttons.
-        self.button1 = ttk.Button(self, text = "Save name", command = self.save_playername)
-        self.button2 = ttk.Button(self, text = "Save game", command = self.save_game)
-        self.button3 = ttk.Button(self, text = "Load game", command = self.load_game)
-        self.button4 = ttk.Button(self, text = "End turn", command = self.gamelogic.run_simulation)
+        self.save_playernameButton = ttk.Button(self, text ="Save name", command = self.save_playername)
+        self.save_gameButton = ttk.Button(self, text = "Save game", command = self.save_game)
+        self.load_gameButton = ttk.Button(self, text = "Load game", command = self.load_game)
+        self.delete_saveButton = ttk.Button(self, text = "Delete save", command = self.delete_saved_game)
+        self.end_turnButton = ttk.Button(self, text = "End turn", command = self.gamelogic.run_simulation)
         self.quitButton = ttk.Button(self, text = "Quit", command = self.quit)
 
         # Creating labelframes.
@@ -210,22 +216,25 @@ class GUI(Frame):
         # Row 7:
 
         # Row 8:
-        self.saved_nameLabel.grid(row = 8, column = 0, sticky = W)
-        self.error_playernameLabel.grid(row = 8, column = 0, sticky = W)
+        self.saved_nameLabel.grid(row = 8, column = 1, sticky = W)
+        self.error_playernameLabel.grid(row = 8, column = 1, sticky = W)
         self.error_playernameLabel.grid_remove()
 
         # Row 9:
-        self.nameentry.grid(row = 9, column = 0, sticky = W)
+        self.save_gameEntry.grid(row = 9, column = 0, sticky = W)
+        self.save_gameButton.grid(row = 9, column = 1)
+        self.nameentry.grid(row = 9, column = 2, sticky = W)
         self.nameentry.focus()
-        self.save_name.grid(row = 9, column = 2, sticky = W)
-        self.button1.grid(row = 9, column = 1)
-        self.button2.grid(row = 9, column = 3)
-        self.button4.grid(row = 9, column = 6)
+        self.save_playernameButton.grid(row = 9, column = 3)
+        self.end_turnButton.grid(row = 9, column = 6)
         self.quitButton.grid(row = 9, column = 8, sticky = E)
 
         # Row 10:
         self.saved_gamesCombobox.grid(row = 10, column = 0)
-        self.button3.grid(row = 10, column = 1)
+        self.load_gameButton.grid(row = 10, column = 1)
+
+        # Row 11:
+        self.delete_saveButton.grid(row = 11, column = 1)
 
 
     # Binding actions to elements. Double-1 means double left click.

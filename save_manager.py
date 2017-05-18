@@ -42,6 +42,18 @@ class SaveManager:
         return self.saved_games
 
 
+    def delete_saved_game(self, save_name):
+        if save_name in self.saved_games or save_name[:-4] in self.saved_games:
+            print("Deleting save '%s'" % save_name)
+            self.saved_games.remove(save_name)
+            if os.path.exists("Saves/%s" % save_name):
+                os.remove("Saves/%s" % save_name)
+            elif os.path.exists("Saves/%s.dat" % save_name):
+                os.remove("Saves/%s.dat" % save_name)
+        else:
+            print("Can't find save '%s' in saved games list; not deleting!" % save_name)
+
+
     def save_game_state(self, save_name):
         if not os.path.exists("Saves"):
             os.mkdir("Saves")
