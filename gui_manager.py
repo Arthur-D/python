@@ -45,8 +45,11 @@ class GUI(Frame):
         self.set_UI_widgets()
         self.set_widgets_on_grid()
         self.set_widget_mouse_bindings()
-        self.statemanager.set_StringVars()
         self.set_saved_games(self.saved_gamesCombobox)
+
+        self.buildingmanager.set_building_amountStringVars()
+        self.turnmanager.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
+
 
 
     # Function for creating the window context.
@@ -87,6 +90,26 @@ class GUI(Frame):
         self.queuemanager.move_in_building_queue(self.building_queueListbox)
 
 
+    def show_confirm_and_abortButton(self):
+        self.confirmButton.grid(row = 11, column = 0)
+        self.abortButton.grid(row = 11, column = 1)
+
+
+    def confirm(self):
+        if self.statemanager.confirm_function == "delete_saved_game":
+            self.gamelogic.delete_saved_game(self.saved_gamesCombobox)
+            self.saved_gamesCombobox.set("Select saved game")
+        elif self.statemanager.confirm_function == "save_game":
+            self.savemanager.save_game_state(self.gamelogic.save_name)
+        self.abort()
+
+
+    def abort(self):
+        self.statemanager.set_confirm_function(None)
+        self.confirmButton.grid_remove()
+        self.abortButton.grid_remove()
+
+
     def set_saved_games(self, saved_gamesCombobox):
         self.saved_gamesCombobox.set("Select saved game")
         self.gamelogic.set_saved_games(self.saved_gamesCombobox)
@@ -105,8 +128,11 @@ class GUI(Frame):
 
 
     def delete_saved_game(self):
-        self.gamelogic.delete_saved_game(self.saved_gamesCombobox)
-        self.saved_gamesCombobox.set("Select saved game")
+        if self.saved_gamesCombobox.current() > -1:
+            self.show_confirm_and_abortButton()
+            self.statemanager.set_confirm_function("delete_saved_game")
+        else:
+            print("Select a save game!")
 
 
     # Communication function between this class and the GameLogic class.
@@ -152,6 +178,8 @@ class GUI(Frame):
         self.save_gameButton = ttk.Button(self, text = "Save game", command = self.save_game)
         self.load_gameButton = ttk.Button(self, text = "Load game", command = self.load_game)
         self.delete_saveButton = ttk.Button(self, text = "Delete save", command = self.delete_saved_game)
+        self.confirmButton = ttk.Button(self, text = "Confirm", command = self.confirm)
+        self.abortButton = ttk.Button(self, text = "Abort", command = self.abort)
         self.end_turnButton = ttk.Button(self, text = "End turn", command = self.gamelogic.run_simulation)
         self.quitButton = ttk.Button(self, text = "Quit", command = self.quit)
 
@@ -161,20 +189,20 @@ class GUI(Frame):
 
         # Creating labels.
         self.add_buildingsLabel = ttk.Label(self, text = "Add building")
-        self.turnLabel = ttk.Label(self, textvariable = self.statemanager.turn_numberStringVar)
+        self.turnLabel = ttk.Label(self, textvariable = self.turnmanager.turn_numberStringVar)
         self.building_queueLabel = ttk.Label(self, text = "Building queue")
         self.building_descriptionLabel = ttk.Label(self, textvariable = self.buildingmanager.building_descriptionStringVar)
-        self.turns_left_building_queueLabel = ttk.Label(self, textvariable = self.statemanager.turns_left_building_queueStringVar)
+        self.turns_left_building_queueLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_building_queueStringVar)
         self.building_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.building_buildingStringVar)
         self.built_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.built_buildingStringVar)
         self.building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_turnsStringVar)
         self.building_building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_building_turnsStringVar)
 
         self.building_amountsLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.building_amountsStringVar)
-        self.air_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.statemanager.air_purifier_amountStringVar)
-        self.house_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.statemanager.house_amountStringVar)
-        self.robot_factory_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.statemanager.robot_factory_amountStringVar)
-        self.water_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.statemanager.water_purifier_amountStringVar)
+        self.air_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.air_purifier_amountStringVar)
+        self.house_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.house_amountStringVar)
+        self.robot_factory_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.robot_factory_amountStringVar)
+        self.water_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.water_purifier_amountStringVar)
 
 
     # Placement of UI elements on the grid.

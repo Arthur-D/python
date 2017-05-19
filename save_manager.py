@@ -68,8 +68,12 @@ class SaveManager:
 
     def save_game_state(self, save_name):
         if not os.path.exists("Saves"):
+            print("Creating Saves folder")
             os.mkdir("Saves")
+        print("Saving game as %s" % save_name)
         saveFile = shelve.open("Saves/%s" % save_name)
+        saveFile["StateManager.turn_number"] = self.statemanager.turn_number
+
         saveFile["StateManager.air_purifier_amount"] = self.statemanager.air_purifier_amount
         saveFile["StateManager.house_amount"] = self.statemanager.house_amount
         saveFile["StateManager.robot_factory_amount"] = self.statemanager.robot_factory_amount
@@ -81,6 +85,8 @@ class SaveManager:
 
     def load_game_state(self, save_name):
         saveFile = shelve.open("Saves/%s" % save_name)
+        self.turn_number = saveFile["StateManager.turn_number"]
+
         self.air_purifier_amount = saveFile["StateManager.air_purifier_amount"]
         self.house_amount = saveFile["StateManager.house_amount"]
         self.robot_factory_amount = saveFile["StateManager.robot_factory_amount"]
@@ -96,9 +102,15 @@ class SaveManager:
         self.statemanager.set_robot_factory_amount(self.robot_factory_amount)
         self.statemanager.set_water_purifier_amount(self.water_purifier_amount)
 
+        self.statemanager.set_turn_number(self.turn_number)
+        self.buildingmanager.set_building_amountStringVars()
         self.queuemanager.set_building_queue(self.building_queue)
         self.queuemanager.set_building_queue_names()
         self.buildingmanager.set_building_queue_turns()
         self.turnmanager.set_turns_left_building_queue()
+        self.buildingmanager.set_building_construction()
 
-        self.statemanager.set_StringVars()
+        # Resetting the labels when loading.
+        self.turnmanager.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
+        self.buildingmanager.built_buildingStringVar.set("")
+        self.buildingmanager.building_descriptionStringVar.set("")

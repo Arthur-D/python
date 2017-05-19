@@ -19,8 +19,7 @@ class QueueManager():
 
 
     def set_building_queue(self, saved_queue):
-        for building in saved_queue:
-            self.building_queue.append(building)
+        self.building_queue = saved_queue
 
 
     # Sets the visible names in the building queue for display.
@@ -75,3 +74,4 @@ class QueueManager():
             building_queueListbox.selection_set(selection_id + 1)
             self.set_building_queue_names()
             self.buildingmanager.set_building_queue_turns()
+            self.buildingmanager.set_building_construction()

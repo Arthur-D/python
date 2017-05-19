@@ -3,12 +3,12 @@
     <counts>
       <entry feature="AbstractNewProjectStep.Pure Python" count="1" />
       <entry feature="StripeButton[Version Control].shown" count="2" />
-      <entry feature="execute.PythonConfigurationType.Run" count="87" />
+      <entry feature="execute.PythonConfigurationType.Run" count="88" />
       <entry feature="ide.settings.General" count="1" />
       <entry feature="ide.settings.Keymap" count="2" />
       <entry feature="ide.settings.Project_Interpreter" count="1" />
       <entry feature="ide.settings.Version_Control" count="1" />
-      <entry feature="ideaapp.started" count="5" />
+      <entry feature="ideaapp.started" count="6" />
       <entry feature="terminal.linux" count="1" />
       <entry feature="tips.of.the.day.next" count="5" />
       <entry feature="welcome.screen.WelcomeScreen.GetFromVcs" count="1" />

@@ -28,11 +28,6 @@ class Building():
 # Class for handling the buildings.
 class BuildingManager:
     def __init__(self, statemanager):
-        self.air_purifier_amount = 0
-        self.house_amount = 0
-        self.robot_factory_amount = 0
-        self.water_purifier_amount = 0
-
         self.buildings_names = ""
         self.buildings_names_list = []
         self.building_turns = ""
@@ -45,6 +40,10 @@ class BuildingManager:
         self.built_buildingStringVar = StringVar()
         self.building_amountsStringVar = StringVar()
         self.building_turnsStringVar = StringVar()
+        self.air_purifier_amountStringVar = StringVar()
+        self.house_amountStringVar = StringVar()
+        self.robot_factory_amountStringVar = StringVar()
+        self.water_purifier_amountStringVar = StringVar()
 
         self.statemanager = statemanager
         self.set_building_properties()
@@ -159,7 +158,7 @@ class BuildingManager:
             self.statemanager.set_water_purifier_amount(self.statemanager.water_purifier_amount + 1)
         else:
             print("No building to increase!")
-        self.statemanager.set_StringVars()
+        self.set_building_amountStringVars()
 
 
     # Sets what building is currently being constructed for display purposes only.
@@ -167,7 +166,7 @@ class BuildingManager:
         if self.get_currently_building_name():
             self.building_buildingStringVar.set("Building %s" % self.get_currently_building_name())
         else:
-            self.building_buildingStringVar.set("Nothing to build")
+            self.building_buildingStringVar.set("")
 
 
     # Controls what happens when double clicking an item in the building list.
@@ -190,3 +189,10 @@ class BuildingManager:
         self.set_building_construction()
         self.turnmanager.set_turns_left_building_queue()
         self.set_building_queue_turns()
+
+
+    def set_building_amountStringVars(self):
+        self.air_purifier_amountStringVar.set("Air purifiers: %s" % self.statemanager.air_purifier_amount)
+        self.house_amountStringVar.set("Houses: %s" % self.statemanager.house_amount)
+        self.robot_factory_amountStringVar.set("Robot factories: %s" % self.statemanager.robot_factory_amount)
+        self.water_purifier_amountStringVar.set("Water purifiers: %s" % self.statemanager.water_purifier_amount)

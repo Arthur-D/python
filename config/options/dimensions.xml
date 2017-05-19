@@ -18,6 +18,7 @@
     <location key="CommitChangelistDialog2.0.0.1024.600" x="0" y="25" />
     <location key="Vcs.Push.Dialog.0.0.1024.600" x="327" y="27" />
     <location key="git4idea.merge.GitPullDialog.0.0.1024.600" x="265" y="98" />
+    <location key="VCS.ChangelistChooser.0.0.1920.1080" x="811" y="431" />
     <size key="GridCell.Tab.0.left.0.0.1920.1080" width="1373" height="262" />
     <size key="GridCell.Tab.0.center.0.0.1920.1080" width="1373" height="262" />
     <size key="GridCell.Tab.0.right.0.0.1920.1080" width="1373" height="262" />

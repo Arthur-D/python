@@ -41,6 +41,8 @@ def main():
     savemanager.set_queuemanager(queuemanager)
 
     app = GUI(root, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager, statemanager)
+    gamelogic.set_guimanager(app)
+    turnmanager.set_guimanager(app)
     root.mainloop()
 
 
@@ -74,11 +76,14 @@ class GameLogic():
         self.statemanager = statemanager
 
 
-    # This defines what happens when clicking End turn.
+    # This defines what happens when clicking End turn_number.
     def run_simulation(self):
-        self.turnmanager.increase_game_turns()
-        self.turnmanager.decrease_building_turns()
-        self.buildingmanager.set_building_queue_turns()
+        if self.statemanager.turn_number < 100:
+            self.turnmanager.increase_game_turns()
+            self.turnmanager.decrease_building_turns()
+            self.buildingmanager.set_building_queue_turns()
+        else:
+            print("Turn number is 100, game over")
 
 
     # Logic for saving playername to labels in GUI.
@@ -95,12 +100,15 @@ class GameLogic():
 
     def save_game(self, saved_gamesCombobox):
         self.save_name = str(self.save_nameStringVar.get())
-        if self.save_name != "":
-            self.savemanager.save_game_state(self.save_name)
-            print("Saving game as %s" % self.save_name)
-            self.set_saved_games(saved_gamesCombobox)
+        if self.save_name not in self.savemanager.saved_games:
+            if self.save_name != "":
+                self.savemanager.save_game_state(self.save_name)
+                self.set_saved_games(saved_gamesCombobox)
+            else:
+                print("Error saving game: name empty!")
         else:
-            print("Error saving game: name empty!")
+            self.guimanager.show_confirm_and_abortButton()
+            self.statemanager.set_confirm_function("save_game")
 
 
     def set_saved_games(self, saved_gamesCombobox):
@@ -127,13 +135,9 @@ class GameLogic():
 
 
     def delete_saved_game(self, saved_gamesCombobox):
-        selection = saved_gamesCombobox.current()
-        if selection > -1:
-            save_game = self.savemanager.saved_games[selection]
-            self.savemanager.delete_saved_game(save_game)
-            self.set_saved_games(saved_gamesCombobox)
-        else:
-            print("Select a save game!")
+        save_game = self.savemanager.saved_games[saved_gamesCombobox.current()]
+        self.savemanager.delete_saved_game(save_game)
+        self.set_saved_games(saved_gamesCombobox)
 
 
 

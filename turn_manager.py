@@ -5,11 +5,16 @@ from tkinter import StringVar
 # Class managing all turns.
 class TurnManager():
     def __init__(self):
-        pass
+        self.turn_numberStringVar = StringVar()
+        self.turns_left_building_queueStringVar = StringVar()
 
 
     def set_buildingmanager(self, buildingmanager):
         self.buildingmanager = buildingmanager
+
+
+    def set_guimanager(self, guimanager):
+        self.guimanager = guimanager
 
 
     def set_statemanager(self, statemanager):
@@ -20,7 +25,7 @@ class TurnManager():
         self.queuemanager = queuemanager
 
 
-    # Decreases the amount of turns for the foremost building in the queue if End turn button is pressed.
+    # Decreases the amount of turns for the foremost building in the queue if End turn_number button is pressed.
     def decrease_building_turns(self):
         if self.queuemanager.building_queue:
             building = self.queuemanager.building_queue[self.buildingmanager.get_currently_building_index()]
@@ -37,16 +42,19 @@ class TurnManager():
             turn_amount += building.get_turns()
         self.statemanager.set_turns_left_building_queue(turn_amount)
         if len(self.queuemanager.building_queue) > 0:
-            self.statemanager.turns_left_building_queueStringVar.set(
+            self.turns_left_building_queueStringVar.set(
                 "Turns left for\nbuilding queue: %s" % self.statemanager.turns_left_building_queue)
         else:
-            self.statemanager.turns_left_building_queueStringVar.set("")
+            self.turns_left_building_queueStringVar.set("")
 
 
-    # Increments the global turn counter. See GameLogic.run_simulation() for the other things happening when clicking End turn.
+    # Increments the global turn_number counter. See GameLogic.run_simulation() for the other things happening when clicking End turn_number.
     def increase_game_turns(self):
-        turn = self.statemanager.turn
-        if self.statemanager.turn < 100:
-            turn += 1
-            self.statemanager.set_turn(turn)
-            print("Turn", self.statemanager.turn)
+        turn_number = self.statemanager.turn_number
+        turn_number += 1
+        self.statemanager.set_turn_number(turn_number)
+        self.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
+        if self.guimanager.confirmButton.winfo_viewable():
+            print("Aborting action needing confirmation")
+            self.guimanager.abort()
+        print("Turn", self.statemanager.turn_number)
