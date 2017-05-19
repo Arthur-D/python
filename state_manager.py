@@ -1,10 +1,12 @@
-from tkinter import StringVar
 from gametest import *
 
 
 
 class StateManager:
     def __init__(self):
+        self.turn = 0
+        self.turns_left_building_queue = 0
+
         self.air_purifier_amount = 0
         self.house_amount = 0
         self.robot_factory_amount = 0
@@ -14,6 +16,19 @@ class StateManager:
         self.house_amountStringVar = StringVar()
         self.robot_factory_amountStringVar = StringVar()
         self.water_purifier_amountStringVar = StringVar()
+        self.turn_numberStringVar = StringVar()
+        self.turn_numberStringVar.set("Turn %s" % self.turn)
+        self.turns_left_building_queueStringVar = StringVar()
+
+
+    def set_turn(self, turn):
+        self.turn = turn
+        self.set_StringVars()
+
+
+    def set_turns_left_building_queue(self, turns):
+        self.turns_left_building_queue = turns
+        self.set_StringVars()
 
 
     def set_air_purifier_amount(self, amount):
@@ -35,6 +50,8 @@ class StateManager:
 
     # Sets all StringVars.
     def set_StringVars(self):
+        self.turn_numberStringVar.set("Turn %s" % self.turn)
+
         self.air_purifier_amountStringVar.set("Air purifiers: %s" % self.air_purifier_amount)
         self.house_amountStringVar.set("Houses: %s" % self.house_amount)
         self.robot_factory_amountStringVar.set("Robot factories: %s" % self.robot_factory_amount)

@@ -18,8 +18,13 @@ class QueueManager():
         self.turnmanager = turnmanager
 
 
+    def set_building_queue(self, saved_queue):
+        for building in saved_queue:
+            self.building_queue.append(building)
+
+
     # Sets the visible names in the building queue for display.
-    def set_building_queue(self):
+    def set_building_queue_names(self):
         buildings_names = ""
         for building_property in self.building_queue:
             buildings_names += "{%s}\n" % (building_property.get_name())
@@ -29,14 +34,14 @@ class QueueManager():
     # Inserts a new building into the building queue.
     def add_to_building_queue(self, selection_id):
         self.building_queue.insert(0, (Building(self.buildingmanager.building_properties[selection_id])))
-        self.set_building_queue()
+        self.set_building_queue_names()
 
 
     # Handles removal of a building from the visible building queue after it's been built.
     def remove_from_building_queue(self):
         if self.building_queue:
             self.building_queue.pop()
-            self.set_building_queue()
+            self.set_building_queue_names()
         else:
             print("Building queue empty")
 
@@ -48,7 +53,7 @@ class QueueManager():
             selection_id = int(selection[0])
             self.buildingmanager.set_previous_building()
             self.building_queue.pop(selection_id)
-            self.set_building_queue()
+            self.set_building_queue_names()
             self.buildingmanager.set_building_construction()
             print("self.buildingmanager.get_currently_building_index() in QueueManager.delete_from_building_queue(): ", self.buildingmanager.get_currently_building_index())
             print("selection_id in QueueManager.delete_from_building_queue(): ", selection_id)
@@ -68,5 +73,5 @@ class QueueManager():
             self.building_queue.insert(selection_id + 1, building)
             building_queueListbox.selection_clear(selection_id)
             building_queueListbox.selection_set(selection_id + 1)
-            self.set_building_queue()
+            self.set_building_queue_names()
             self.buildingmanager.set_building_queue_turns()

@@ -161,10 +161,10 @@ class GUI(Frame):
 
         # Creating labels.
         self.add_buildingsLabel = ttk.Label(self, text = "Add building")
-        self.turnLabel = ttk.Label(self, textvariable = self.turnmanager.turn_numberStringVar)
+        self.turnLabel = ttk.Label(self, textvariable = self.statemanager.turn_numberStringVar)
         self.building_queueLabel = ttk.Label(self, text = "Building queue")
         self.building_descriptionLabel = ttk.Label(self, textvariable = self.buildingmanager.building_descriptionStringVar)
-        self.turns_left_building_queueLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_building_queueStringVar)
+        self.turns_left_building_queueLabel = ttk.Label(self, textvariable = self.statemanager.turns_left_building_queueStringVar)
         self.building_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.building_buildingStringVar)
         self.built_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.built_buildingStringVar)
         self.building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_turnsStringVar)
@@ -216,8 +216,8 @@ class GUI(Frame):
         # Row 7:
 
         # Row 8:
-        self.saved_nameLabel.grid(row = 8, column = 1, sticky = W)
-        self.error_playernameLabel.grid(row = 8, column = 1, sticky = W)
+        self.saved_nameLabel.grid(row = 8, column = 2, sticky = W)
+        self.error_playernameLabel.grid(row = 8, column = 2, sticky = W)
         self.error_playernameLabel.grid_remove()
 
         # Row 9:

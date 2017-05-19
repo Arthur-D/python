@@ -28,6 +28,7 @@ def main():
     queuemanager.set_turnmanager(turnmanager)
 
     turnmanager.set_buildingmanager(buildingmanager)
+    turnmanager.set_statemanager(statemanager)
     turnmanager.set_queuemanager(queuemanager)
 
     buildingmanager.set_turnmanager(turnmanager)
@@ -36,6 +37,8 @@ def main():
     savemanager.set_gamelogic(gamelogic)
     savemanager.set_buildingmanager(buildingmanager)
     savemanager.set_statemanager(statemanager)
+    savemanager.set_turnmanager(turnmanager)
+    savemanager.set_queuemanager(queuemanager)
 
     app = GUI(root, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager, statemanager)
     root.mainloop()

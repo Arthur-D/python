@@ -5,16 +5,15 @@ from tkinter import StringVar
 # Class managing all turns.
 class TurnManager():
     def __init__(self):
-        self.turn = 0
-        self.turns_left_building_queue = 0
-
-        self.turn_numberStringVar = StringVar()
-        self.turn_numberStringVar.set("Turn %s" % self.turn)
-        self.turns_left_building_queueStringVar = StringVar()
+        pass
 
 
     def set_buildingmanager(self, buildingmanager):
         self.buildingmanager = buildingmanager
+
+
+    def set_statemanager(self, statemanager):
+        self.statemanager = statemanager
 
 
     def set_queuemanager(self, queuemanager):
@@ -36,17 +35,18 @@ class TurnManager():
         turn_amount = 0
         for index, building in enumerate(self.queuemanager.building_queue):
             turn_amount += building.get_turns()
-        self.turns_left_building_queue = turn_amount
+        self.statemanager.set_turns_left_building_queue(turn_amount)
         if len(self.queuemanager.building_queue) > 0:
-            self.turns_left_building_queueStringVar.set("Turns left for\nbuilding queue: %s" % self.turns_left_building_queue)
+            self.statemanager.turns_left_building_queueStringVar.set(
+                "Turns left for\nbuilding queue: %s" % self.statemanager.turns_left_building_queue)
         else:
-            self.turns_left_building_queueStringVar.set("")
-        print("Turns left for building queue: ", self.turns_left_building_queue)
+            self.statemanager.turns_left_building_queueStringVar.set("")
 
 
     # Increments the global turn counter. See GameLogic.run_simulation() for the other things happening when clicking End turn.
     def increase_game_turns(self):
-        if self.turn < 100:
-            self.turn += 1
-            self.turn_numberStringVar.set("Turn %s" % self.turn)
-            print("Turn", self.turn)
+        turn = self.statemanager.turn
+        if self.statemanager.turn < 100:
+            turn += 1
+            self.statemanager.set_turn(turn)
+            print("Turn", self.statemanager.turn)

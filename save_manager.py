@@ -1,6 +1,5 @@
 import shelve
 import os
-from tkinter import StringVar
 from state_manager import *
 
 
@@ -22,6 +21,14 @@ class SaveManager:
         self.statemanager = statemanager
 
 
+    def set_turnmanager(self, turnmanager):
+        self.turnmanager = turnmanager
+
+
+    def set_queuemanager(self, queuemanager):
+        self.queuemanager = queuemanager
+
+
     def set_saved_games(self):
         if os.path.exists("Saves"):
             for filename in os.listdir("Saves/"):
@@ -31,7 +38,7 @@ class SaveManager:
                     if "." not in filename:
                         self.saved_games.append(filename)
                         print("Adding %s to saved games list" % filename)
-                    else:
+                    elif filename.endswith(".dat"):
                         self.saved_games.append(filename[:-4])
                         print("Adding %s to saved games list" % filename[:-4])
         else:
@@ -48,8 +55,13 @@ class SaveManager:
             self.saved_games.remove(save_name)
             if os.path.exists("Saves/%s" % save_name):
                 os.remove("Saves/%s" % save_name)
+            elif os.path.exists("Saves/%s.bak" % save_name):
+                os.remove("Saves/%s.bak" % save_name)
             elif os.path.exists("Saves/%s.dat" % save_name):
                 os.remove("Saves/%s.dat" % save_name)
+            elif os.path.exists("Saves/%s.dir" % save_name):
+                os.remove("Saves/%s.dir" % save_name)
+            print("self.saved_games in SaveManager.delete_saved_game(): ", self.saved_games)
         else:
             print("Can't find save '%s' in saved games list; not deleting!" % save_name)
 
@@ -62,6 +74,8 @@ class SaveManager:
         saveFile["StateManager.house_amount"] = self.statemanager.house_amount
         saveFile["StateManager.robot_factory_amount"] = self.statemanager.robot_factory_amount
         saveFile["StateManager.water_purifier_amount"] = self.statemanager.water_purifier_amount
+
+        saveFile["QueueManager.building_queue"] = self.queuemanager.building_queue
         saveFile.close()
 
 
@@ -71,6 +85,8 @@ class SaveManager:
         self.house_amount = saveFile["StateManager.house_amount"]
         self.robot_factory_amount = saveFile["StateManager.robot_factory_amount"]
         self.water_purifier_amount = saveFile["StateManager.water_purifier_amount"]
+
+        self.building_queue = saveFile["QueueManager.building_queue"]
         saveFile.close()
 
 
@@ -79,4 +95,10 @@ class SaveManager:
         self.statemanager.set_house_amount(self.house_amount)
         self.statemanager.set_robot_factory_amount(self.robot_factory_amount)
         self.statemanager.set_water_purifier_amount(self.water_purifier_amount)
+
+        self.queuemanager.set_building_queue(self.building_queue)
+        self.queuemanager.set_building_queue_names()
+        self.buildingmanager.set_building_queue_turns()
+        self.turnmanager.set_turns_left_building_queue()
+
         self.statemanager.set_StringVars()
