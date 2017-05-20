@@ -48,7 +48,7 @@ class TurnManager():
             self.turns_left_building_queueStringVar.set("")
 
 
-    # Increments the global turn_number counter. See GameLogic.run_simulation() for the other things happening when clicking End turn_number.
+    # Increments the global turn_number counter. See GameLogic.run_simulation() for the other things happening when clicking End turn.
     def increase_game_turns(self):
         turn_number = self.statemanager.turn_number
         turn_number += 1

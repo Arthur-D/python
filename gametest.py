@@ -23,6 +23,7 @@ def main():
     gamelogic.set_buildingmanager(buildingmanager)
     gamelogic.set_savemanager(savemanager)
     gamelogic.set_statemanager(statemanager)
+    gamelogic.set_queuemanager(queuemanager)
 
     queuemanager.set_buildingmanager(buildingmanager)
     queuemanager.set_turnmanager(turnmanager)
@@ -76,12 +77,17 @@ class GameLogic():
         self.statemanager = statemanager
 
 
+    def set_queuemanager(self, queuemanager):
+        self.queuemanager = queuemanager
+
+
     # This defines what happens when clicking End turn_number.
     def run_simulation(self):
         if self.statemanager.turn_number < 100:
             self.turnmanager.increase_game_turns()
             self.turnmanager.decrease_building_turns()
-            self.buildingmanager.set_building_queue_turns()
+            self.queuemanager.set_building_queue_names()
+            # self.buildingmanager.set_building_queue_turns()
         else:
             print("Turn number is 100, game over")
 
@@ -118,7 +124,6 @@ class GameLogic():
 
 
     def select_saved_game(self, saved_gamesCombobox):
-        selection = saved_gamesCombobox.current()
         saved_gamesCombobox.select_clear()
 
 
@@ -126,7 +131,6 @@ class GameLogic():
         selection = saved_gamesCombobox.current()
         if selection > -1:
             save_game = self.savemanager.saved_games[selection]
-            stringvar = "self.buildingmanager.air_purifier_amountStringVar"
             self.savemanager.load_game_state(save_game)
             self.savemanager.set_game_state()
             print("Loading save '%s'" % save_game)

@@ -25,8 +25,9 @@ class QueueManager():
     # Sets the visible names in the building queue for display.
     def set_building_queue_names(self):
         buildings_names = ""
-        for building_property in self.building_queue:
-            buildings_names += "{%s}\n" % (building_property.get_name())
+        for building in self.building_queue:
+            # First and last two brackets are denoting it as a literal, while the middle bracket ones are the .format representations of strings. :15 pads the first one to the left by 15 characters.
+            buildings_names += ("{{{:15}{}}}\n").format(building.get_name(), building.get_turns())
         self.building_queueStringVar.set(buildings_names)
 
 
