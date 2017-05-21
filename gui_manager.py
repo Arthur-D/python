@@ -11,9 +11,7 @@ class GUI(Frame):
         self.parent = parent
         self.style = ttk.Style()
         self.style.theme_use("default")
-        #self.style.configure("TButton", padding = (0, 2, 0, 0), font = "TkFixedFont")
-        self.style.configure("building_turns.TLabel", font = "TkTextFont 11")
-        self.style.configure("building_queue", font = "TkFixedFont")
+        self.style.configure("building_list", font = "TkFixedFont")
 
         self.initUI()
         self.gamelogic = gamelogic
@@ -24,11 +22,11 @@ class GUI(Frame):
         self.statemanager = statemanager
 
         # Listing buildings you can build.
-        self.buildingsListbox = Listbox(self, width = 16, height = 13, background = "white", listvariable = self.buildingmanager.buildingsStringVar)
+        self.buildingsListbox = Listbox(self, font = "TkFixedFont", width = 16, height = 10, background = "white", listvariable = self.buildingmanager.buildingsStringVar)
 
         # Listing buildings in the building queue.
         self.building_queueListbox = Listbox(self, font = "TkFixedFont", width = 16, height = 5, background = "white", selectmode = "browse", listvariable = self.queuemanager.building_queueStringVar)
-        self.building_queueListbox.configure(self.building_queueListbox.yview_scroll(1, "units"))
+        # self.building_queueListbox.configure(self.building_queueListbox.yview_scroll(1, "units"))
 
         # A name entry widget.
         self.nameentry = ttk.Entry(self, width = 16, textvariable = self.gamelogic.playernameStringVar)
@@ -144,6 +142,14 @@ class GUI(Frame):
             print("Select a save game!")
 
 
+    def set_building_queueScrollbar_visibility(self):
+        print("self.building_queueListbox.size(), self.building_queueListbox.cget('height') in GUI.set_building_queueScrollbar_visibility(): ", self.building_queueListbox.size(), self.building_queueListbox.cget("height"))
+        if self.building_queueListbox.size() > self.building_queueListbox.cget("height"):
+            self.building_queueScrollbar.grid(row=4, column=0, sticky=(NE, S))
+        else:
+            self.building_queueScrollbar.grid_remove()
+
+
     # Communication function between this class and the GameLogic class.
     def save_playername(self):
         self.gamelogic.save_playername(self.saved_nameLabel, self.error_playernameLabel)
@@ -197,7 +203,7 @@ class GUI(Frame):
         self.buildingsLabelframe = ttk.Labelframe(self, text = "Buildings", labelanchor = "nw", width = 100, height = 200)
 
         #Creating scrollbars.
-        self.building_queueScrollbar = ttk.Scrollbar(self, orient = VERTICAL, command = self.building_queueListbox)
+        self.building_queueScrollbar = ttk.Scrollbar(self, orient = VERTICAL, command = self.building_queueListbox.yview)
         self.building_queueListbox.configure(yscrollcommand = self.building_queueScrollbar.set)
 
         # Creating labels.
@@ -208,8 +214,7 @@ class GUI(Frame):
         self.turns_left_building_queueLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_building_queueStringVar)
         self.building_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.building_buildingStringVar)
         self.built_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.built_buildingStringVar)
-        self.building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", textvariable = self.buildingmanager.building_turnsStringVar)
-        self.building_building_turnsLabel = ttk.Label(self, style = "building_turns.TLabel", wraplength = 2, pad = "2 1 2 1", anchor = "w", textvariable = self.buildingmanager.building_building_turnsStringVar)
+
 
         # self.building_amountsLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.building_amountsStringVar)
         self.air_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.air_purifier_amountStringVar)
@@ -234,7 +239,6 @@ class GUI(Frame):
 
         # Row 2:
         self.buildingsListbox.grid(row = 2, column = 0, sticky = W)
-        self.building_turnsLabel.grid(row = 2, column = 1, sticky = NW)
         self.building_descriptionLabel.grid(row = 2, column = 2, sticky = NW)
         self.buildingsLabelframe.grid(row = 2, column = 8, sticky = W)
         self.house_amountLabel.grid(row = 2, column = 8, sticky = W)
@@ -246,13 +250,10 @@ class GUI(Frame):
 
         # Row 4:
         self.building_queueListbox.grid(row = 4, column = 0, sticky = W)
-        self.building_queueScrollbar.grid(row = 4, column = 0, sticky = (NE, S))
-        # self.building_building_turnsLabel.grid(row = 4, column = 1, sticky = N)
         self.water_purifier_amountLabel.grid(row = 4, column = 8, sticky = W)
 
         # Row 5:
         self.building_buildingLabel.grid(row = 5, column = 0, sticky = W)
-        # self.built_buildingLabel.grid(row = 5, column = 0, sticky = W)
 
         # Row 6:
         self.turns_left_building_queueLabel.grid(row = 6, column = 0, sticky = W)

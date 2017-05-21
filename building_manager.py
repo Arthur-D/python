@@ -50,6 +50,10 @@ class BuildingManager:
         self.set_building_turns()
 
 
+    def set_guimanager(self, guimanager):
+        self.guimanager = guimanager
+
+
     def set_turnmanager(self, turnmanager):
         self.turnmanager = turnmanager
 
@@ -90,7 +94,7 @@ class BuildingManager:
     # Populate the list of possible buildings to build, both for display purposes and also in an actual list.
     def set_building_names(self):
         for building_property in self.building_properties:
-            self.buildings_names += "{%s}\n" % (building_property["Name"])
+            self.buildings_names += "{{{:15}{}}}\n".format(building_property["Name"], building_property["Turn amount"])
             self.buildings_names_list.append(building_property["Name"])
         self.buildingsStringVar.set(self.buildings_names)
 
@@ -177,6 +181,7 @@ class BuildingManager:
         self.set_building_queue_turns()
         self.turnmanager.set_turns_left_building_queue()
         self.set_building_construction()
+        self.guimanager.set_building_queueScrollbar_visibility()
 
 
     # This defines what happens when finishing building something.
@@ -189,6 +194,7 @@ class BuildingManager:
         self.set_building_construction()
         self.turnmanager.set_turns_left_building_queue()
         self.set_building_queue_turns()
+        self.guimanager.set_building_queueScrollbar_visibility()
 
 
     def set_building_amountStringVars(self):

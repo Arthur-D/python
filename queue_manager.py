@@ -14,6 +14,10 @@ class QueueManager():
         self.buildingmanager = buildingmanager
 
 
+    def set_guimanager(self, guimanager):
+        self.guimanager = guimanager
+
+
     def set_turnmanager(self, turnmanager):
         self.turnmanager = turnmanager
 
@@ -61,6 +65,7 @@ class QueueManager():
             print("No more buildings to remove. Building queue empty.")
         self.turnmanager.set_turns_left_building_queue()
         self.buildingmanager.set_building_queue_turns()
+        self.guimanager.set_building_queueScrollbar_visibility()
 
 
     # Makes it possible to move a building forward in the queue.
@@ -74,5 +79,6 @@ class QueueManager():
             building_queueListbox.selection_clear(selection_id)
             building_queueListbox.selection_set(selection_id + 1)
             self.set_building_queue_names()
+            self.guimanager.building_queueListbox.see(selection_id + 1)
             self.buildingmanager.set_building_queue_turns()
             self.buildingmanager.set_building_construction()

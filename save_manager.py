@@ -13,6 +13,10 @@ class SaveManager:
         self.gamelogic = gamelogic
 
 
+    def set_guimanager(self, guimanager):
+        self.guimanager = guimanager
+
+
     def set_buildingmanager(self, buildingmanager):
         self.buildingmanager = buildingmanager
 
@@ -109,6 +113,7 @@ class SaveManager:
         self.buildingmanager.set_building_queue_turns()
         self.turnmanager.set_turns_left_building_queue()
         self.buildingmanager.set_building_construction()
+        self.guimanager.set_building_queueScrollbar_visibility()
 
         # Resetting the labels when loading.
         self.turnmanager.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
