@@ -33,10 +33,10 @@ class GUI(Frame):
         self.save_gameEntry = ttk.Entry(self, width = 16, textvariable = self.gamelogic.save_nameStringVar)
 
         # Hidden label to display the name entered in self.nameentry.
-        self.saved_nameLabel = ttk.Label(self, textvariable = self.gamelogic.saved_playernameStringVar)
+        self.saved_nameLabel = ttk.Label(self,  textvariable = self.gamelogic.saved_playernameStringVar)
 
         # Hidden label to display if an invalid name is entered in self.nameentry.
-        self.error_playernameLabel = ttk.Label(self, foreground = "red", text = "Invalid name!")
+        self.error_playernameLabel = ttk.Label(self, foreground = "red", textvariable = self.gamelogic.error_playernameStringVar)
 
         # Creating comboboxes.
         self.saved_gamesCombobox = ttk.Combobox(self, width = 15, state = "readonly")
@@ -73,7 +73,6 @@ class GUI(Frame):
     # Communication function between this class and the BuildingManager class.
     def add_buildings(self, buildingsListbox):
         self.buildingmanager.add_buildings(self.buildingsListbox)
-        self.scroll_building_queue_turns()
 
 
     # Communication function between this class and the BuildingManager class.
@@ -89,12 +88,6 @@ class GUI(Frame):
     # Communication function between this class and the QueueManager class.
     def move_in_building_queue(self, building_queueListbox):
         self.queuemanager.move_in_building_queue(self.building_queueListbox)
-
-
-    def scroll_building_queue_turns(self):
-        for index, building in enumerate(self.queuemanager.building_queue):
-            pass
-            # print("self.building_queueListbox.yview() in GUI.scroll_building_queue_turns: ", self.building_queueListbox.yview())
 
 
     def show_confirm_and_abortButton(self):
@@ -143,7 +136,6 @@ class GUI(Frame):
 
 
     def set_building_queueScrollbar_visibility(self):
-        print("self.building_queueListbox.size(), self.building_queueListbox.cget('height') in GUI.set_building_queueScrollbar_visibility(): ", self.building_queueListbox.size(), self.building_queueListbox.cget("height"))
         if self.building_queueListbox.size() > self.building_queueListbox.cget("height"):
             self.building_queueScrollbar.grid(row=4, column=0, sticky=(NE, S))
         else:
@@ -230,8 +222,9 @@ class GUI(Frame):
         self.grid(sticky = N + S + W + E)
 
         # Row 0:
-        self.turnLabel.grid(row = 0, column = 8, sticky = E)
         self.resourcesLabelframe.grid(row = 0, column = 0, columnspan = 7, sticky = W)
+        self.saved_nameLabel.grid(row = 0, column = 8, sticky = W)
+        self.turnLabel.grid(row = 0, column = 8, sticky = E)
 
         # Row 1:
         self.add_buildingsLabel.grid(row = 1, column = 0, sticky = S)
@@ -261,9 +254,6 @@ class GUI(Frame):
         # Row 7:
 
         # Row 8:
-        self.saved_nameLabel.grid(row = 8, column = 2, sticky = W)
-        self.error_playernameLabel.grid(row = 8, column = 2, sticky = W)
-        self.error_playernameLabel.grid_remove()
 
         # Row 9:
         self.save_gameEntry.grid(row = 9, column = 0, sticky = W)
@@ -277,6 +267,8 @@ class GUI(Frame):
         # Row 10:
         self.saved_gamesCombobox.grid(row = 10, column = 0)
         self.load_gameButton.grid(row = 10, column = 1)
+        self.error_playernameLabel.grid(row = 10, column = 2, sticky = W)
+        self.error_playernameLabel.grid_remove()
 
         # Row 11:
         self.delete_saveButton.grid(row = 11, column = 1)

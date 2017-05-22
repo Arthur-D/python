@@ -55,6 +55,7 @@ def main():
 class GameLogic():
     def __init__(self):
         self.playernameStringVar = StringVar()
+        self.error_playernameStringVar = StringVar()
         self.saved_playernameStringVar = StringVar()
         self.save_nameStringVar = StringVar()
         self.save_nameStringVar.set("gametest_save")
@@ -98,13 +99,16 @@ class GameLogic():
     # Logic for saving playername to labels in GUI.
     def save_playername(self, saved_nameLabel, error_playernameLabel):
         self.saving_name = str(self.playernameStringVar.get())
-        if self.saving_name != "":
-            saved_nameLabel.grid()
-            self.saved_playernameStringVar.set("Welcome, %s" % self.saving_name)
-            error_playernameLabel.grid_remove()
-        else:
+        if self.saving_name == "":
+            self.error_playernameStringVar.set("Enter a name!")
             error_playernameLabel.grid()
-            saved_nameLabel.grid_remove()
+        elif len(self.saving_name) > 8:
+            self.error_playernameStringVar.set("Name can't be more\nthan 8 characters")
+            error_playernameLabel.grid()
+        else:
+            self.saved_playernameStringVar.set(self.saving_name)
+            saved_nameLabel.grid()
+            error_playernameLabel.grid_remove()
 
 
     def save_game(self, saved_gamesCombobox):

@@ -84,6 +84,7 @@ class SaveManager:
         saveFile["StateManager.water_purifier_amount"] = self.statemanager.water_purifier_amount
 
         saveFile["QueueManager.building_queue"] = self.queuemanager.building_queue
+        saveFile["GameLogic.playernameStringVar"] = self.gamelogic.saved_playernameStringVar.get()
         saveFile.close()
 
 
@@ -97,6 +98,7 @@ class SaveManager:
         self.water_purifier_amount = saveFile["StateManager.water_purifier_amount"]
 
         self.building_queue = saveFile["QueueManager.building_queue"]
+        self.saved_playernameStringVar = saveFile["GameLogic.playernameStringVar"]
         saveFile.close()
 
 
@@ -119,3 +121,5 @@ class SaveManager:
         self.turnmanager.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
         self.buildingmanager.built_buildingStringVar.set("")
         self.buildingmanager.building_descriptionStringVar.set("")
+        self.gamelogic.playernameStringVar.set("")
+        self.gamelogic.saved_playernameStringVar.set(self.saved_playernameStringVar)
