@@ -80,11 +80,7 @@ class SaveManager:
         print("Saving game as %s" % save_name)
         saveFile = shelve.open("Saves/%s" % save_name)
         saveFile["StateManager.turn_number"] = self.statemanager.turn_number
-
-        saveFile["StateManager.air_purifier_amount"] = self.statemanager.air_purifier_amount
-        saveFile["StateManager.house_amount"] = self.statemanager.house_amount
-        saveFile["StateManager.robot_factory_amount"] = self.statemanager.robot_factory_amount
-        saveFile["StateManager.water_purifier_amount"] = self.statemanager.water_purifier_amount
+        saveFile["BuildingManager.building_amountsStringVar"] = self.buildingmanager.building_amountsStringVar.get()
 
         saveFile["QueueManager.building_queue"] = self.queuemanager.building_queue
         saveFile["GameLogic.playernameStringVar"] = self.gamelogic.saved_playernameStringVar.get()
@@ -95,11 +91,7 @@ class SaveManager:
     def load_game_state(self, save_name):
         saveFile = shelve.open("Saves/%s" % save_name)
         self.turn_number = saveFile["StateManager.turn_number"]
-
-        self.air_purifier_amount = saveFile["StateManager.air_purifier_amount"]
-        self.house_amount = saveFile["StateManager.house_amount"]
-        self.robot_factory_amount = saveFile["StateManager.robot_factory_amount"]
-        self.water_purifier_amount = saveFile["StateManager.water_purifier_amount"]
+        self.building_amountsStringVar = saveFile["BuildingManager.building_amountsStringVar"]
 
         self.building_queue = saveFile["QueueManager.building_queue"]
         self.saved_playernameStringVar = saveFile["GameLogic.playernameStringVar"]
@@ -108,13 +100,8 @@ class SaveManager:
 
     # Sets the game state again after loading a game. Also resets GUI StringVars.
     def set_game_state(self):
-        self.statemanager.set_air_purifier_amount(self.air_purifier_amount)
-        self.statemanager.set_house_amount(self.house_amount)
-        self.statemanager.set_robot_factory_amount(self.robot_factory_amount)
-        self.statemanager.set_water_purifier_amount(self.water_purifier_amount)
-
         self.statemanager.set_turn_number(self.turn_number)
-        self.buildingmanager.set_building_amountStringVars()
+        self.buildingmanager.set_finished_buildings()
         self.queuemanager.set_building_queue(self.building_queue)
         self.queuemanager.set_building_queue_names()
         self.buildingmanager.set_building_queue_turns()
@@ -124,6 +111,7 @@ class SaveManager:
 
         # Resetting the labels when loading.
         self.turnmanager.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
+        self.buildingmanager.building_amountsStringVar.set(self.building_amountsStringVar)
         self.buildingmanager.built_buildingStringVar.set("")
         self.buildingmanager.building_descriptionStringVar.set("")
         self.gamelogic.playernameStringVar.set("")

@@ -32,6 +32,8 @@ class BuildingManager:
         self.buildings_names_list = []
         self.building_turns = ""
         self.previous_building = ""
+        self.finished_buildings = []
+        self.finished_buildings_amounts = {}
 
         self.buildingsStringVar = StringVar()
         self.building_descriptionStringVar = StringVar()
@@ -150,21 +152,6 @@ class BuildingManager:
             self.previous_building = None
 
 
-    # Increments how many finished buildings there are of each type.
-    def set_building_amounts(self):
-        if self.get_currently_building_name() == "Air purifier":
-            self.statemanager.set_air_purifier_amount(self.statemanager.air_purifier_amount + 1)
-        elif self.get_currently_building_name() == "House":
-            self.statemanager.set_house_amount(self.statemanager.house_amount + 1)
-        elif self.get_currently_building_name() == "Robot factory":
-            self.statemanager.set_robot_factory_amount(self.statemanager.robot_factory_amount + 1)
-        elif self.get_currently_building_name() == "Water purifier":
-            self.statemanager.set_water_purifier_amount(self.statemanager.water_purifier_amount + 1)
-        else:
-            print("No building to increase!")
-        self.set_building_amountStringVars()
-
-
     # Sets what building is currently being constructed for display purposes only.
     def set_building_construction(self):
         if self.get_currently_building_name():
@@ -189,7 +176,7 @@ class BuildingManager:
         self.set_previous_building()
         if self.previous_building:
             self.built_buildingStringVar.set("Built %s" % self.previous_building)
-        self.set_building_amounts()
+        self.set_finished_buildings()
         self.queuemanager.remove_from_building_queue()
         self.set_building_construction()
         self.turnmanager.set_turns_left_building_queue()
@@ -197,8 +184,13 @@ class BuildingManager:
         self.guimanager.set_building_queueScrollbar_visibility()
 
 
-    def set_building_amountStringVars(self):
-        self.air_purifier_amountStringVar.set("Air purifiers: %s" % self.statemanager.air_purifier_amount)
-        self.house_amountStringVar.set("Houses: %s" % self.statemanager.house_amount)
-        self.robot_factory_amountStringVar.set("Robot factories: %s" % self.statemanager.robot_factory_amount)
-        self.water_purifier_amountStringVar.set("Water purifiers: %s" % self.statemanager.water_purifier_amount)
+    def set_finished_buildings(self):
+        self.finished_buildings.append(self.get_currently_building_name())
+        building_amounts = ""
+        for building_name in self.buildings_names_list:
+            self.finished_buildings_amounts[building_name] = self.finished_buildings.count(building_name)
+            if building_name.endswith("y"):
+                building_amounts += "{}ies:{:4}\n".format(building_name[:-1], self.finished_buildings.count(building_name))
+            else:
+                building_amounts += "{}s:{:4}\n".format(building_name, self.finished_buildings.count(building_name))
+        self.building_amountsStringVar.set(building_amounts.rstrip("\n"))

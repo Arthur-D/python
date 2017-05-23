@@ -59,8 +59,6 @@ class QueueManager():
             self.building_queue.pop(selection_id)
             self.set_building_queue_names()
             self.buildingmanager.set_building_construction()
-            print("self.buildingmanager.get_currently_building_index() in QueueManager.delete_from_building_queue(): ", self.buildingmanager.get_currently_building_index())
-            print("selection_id in QueueManager.delete_from_building_queue(): ", selection_id)
         else:
             print("No more buildings to remove. Building queue empty.")
         self.turnmanager.set_turns_left_building_queue()
