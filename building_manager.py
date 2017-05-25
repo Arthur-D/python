@@ -33,6 +33,7 @@ class BuildingManager:
         self.building_turns = ""
         self.previous_building = ""
         self.finished_buildings = []
+        self.finished_buildings_names = []
         self.finished_buildings_amounts = {}
 
         self.buildingsStringVar = StringVar()
@@ -141,7 +142,8 @@ class BuildingManager:
 
     # For getting the index of the foremost building in the queue.
     def get_currently_building_index(self):
-        return len(self.queuemanager.building_queue) - 1
+        if self.queuemanager.building_queue:
+            return len(self.queuemanager.building_queue) - 1
 
 
     # Sets what the previous building in the queue were, for showing what has just finished building.
@@ -185,12 +187,14 @@ class BuildingManager:
 
 
     def set_finished_buildings(self):
-        self.finished_buildings.append(self.get_currently_building_name())
+        if self.get_currently_building_index() != None:
+            self.finished_buildings.append(self.queuemanager.building_queue[self.get_currently_building_index()])
         building_amounts = ""
+        building_names = [building.get_name() for building in self.finished_buildings]
         for building_name in self.buildings_names_list:
-            self.finished_buildings_amounts[building_name] = self.finished_buildings.count(building_name)
+            self.finished_buildings_amounts[building_name] = building_names.count(building_name)
             if building_name.endswith("y"):
-                building_amounts += "{}ies:{:4}\n".format(building_name[:-1], self.finished_buildings.count(building_name))
+                building_amounts += "{}ies:{:4}\n".format(building_name[:-1], building_names.count(building_name))
             else:
-                building_amounts += "{}s:{:4}\n".format(building_name, self.finished_buildings.count(building_name))
+                building_amounts += "{}s:{:4}\n".format(building_name, building_names.count(building_name))
         self.building_amountsStringVar.set(building_amounts.rstrip("\n"))
