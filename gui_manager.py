@@ -5,7 +5,7 @@ from tkinter import ttk
 
 # Class containing the GUI definitions for tkinter and ttk.
 class GUI(Frame):
-    def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager, statemanager):
+    def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager, resourcemanager, savemanager, statemanager):
         # Creates the main frame and background color.
         Frame.__init__(self, parent, background = "#d9d9d9")
         self.parent = parent
@@ -18,6 +18,7 @@ class GUI(Frame):
         self.buildingmanager = buildingmanager
         self.queuemanager = queuemanager
         self.turnmanager = turnmanager
+        self.resourcemanager = resourcemanager
         self.savemanager = savemanager
         self.statemanager = statemanager
 
@@ -49,6 +50,7 @@ class GUI(Frame):
 
         self.buildingmanager.set_finished_buildings()
         self.turnmanager.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
+        self.resourcemanager.energy_resourceStringVar.set("Energy: {}".format(self.statemanager.energy_resource))
 
 
     # Function for creating the window context.
@@ -71,7 +73,7 @@ class GUI(Frame):
 
     # Communication function between this class and the BuildingManager class.
     def add_buildings(self, buildingsListbox):
-        self.buildingmanager.add_buildings(self.buildingsListbox)
+        self.buildingmanager.add_buildings()
 
 
     # Communication function between this class and the BuildingManager class.
@@ -139,6 +141,11 @@ class GUI(Frame):
             self.building_queueScrollbar.grid(row=4, column=0, sticky=(NE, S))
         else:
             self.building_queueScrollbar.grid_remove()
+
+
+    def get_buildingsListbox_selection(self):
+        selection = self.buildingsListbox.curselection()
+        return int(selection[0])
 
 
     # Communication function between this class and the GameLogic class.
@@ -213,7 +220,7 @@ class GUI(Frame):
         self.robot_factory_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.robot_factory_amountStringVar)
         self.water_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.water_purifier_amountStringVar)
 
-        # self.energy_resourceLabel = ttk.Label(self.resourcesLabelframe, textvariable = self.resourcemanager.energy_resourceStringVar)
+        self.energy_resourceLabel = ttk.Label(self.resourcesLabelframe, textvariable = self.resourcemanager.energy_resourceStringVar)
 
 
     # Placement of UI elements on the grid.
@@ -222,27 +229,24 @@ class GUI(Frame):
 
         # Row 0:
         self.resourcesLabelframe.grid(row = 0, column = 0, columnspan = 7, sticky = W)
+        self.energy_resourceLabel.grid(row = 0, column = 1, sticky = W)
         self.saved_nameLabel.grid(row = 0, column = 8, sticky = W)
         self.turnLabel.grid(row = 0, column = 8, sticky = E)
 
         # Row 1:
         self.add_buildingsLabel.grid(row = 1, column = 0, sticky = S)
-        # self.air_purifier_amountLabel.grid(row = 1, column = 8, sticky = W)
 
         # Row 2:
         self.buildingsListbox.grid(row = 2, column = 0, sticky = W)
         self.building_descriptionLabel.grid(row = 2, column = 2, sticky = NW)
         self.buildingsLabelframe.grid(row = 2, column = 8, sticky = W)
-        # self.house_amountLabel.grid(row = 2, column = 8, sticky = W)
 
         # Row 3:
         self.building_queueLabel.grid(row = 3, column = 0, sticky = S)
-        # self.robot_factory_amountLabel.grid(row = 3, column= 8 , sticky = W)
         self.built_buildingLabel.grid(row = 3, column = 8, sticky = W)
 
         # Row 4:
         self.building_queueListbox.grid(row = 4, column = 0, sticky = W)
-        # self.water_purifier_amountLabel.grid(row = 4, column = 8, sticky = W)
 
         # Row 5:
         self.building_buildingLabel.grid(row = 5, column = 0, sticky = W)

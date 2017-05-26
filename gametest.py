@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import ttk
 from turn_manager import *
 from building_manager import *
+from resource_manager import *
 from save_manager import *
 from state_manager import *
 
@@ -17,10 +18,12 @@ def main():
     queuemanager = QueueManager()
     turnmanager = TurnManager()
     buildingmanager = BuildingManager(statemanager)
+    resourcemanager = ResourceManager()
     savemanager = SaveManager()
 
     gamelogic.set_turnmanager(turnmanager)
     gamelogic.set_buildingmanager(buildingmanager)
+    gamelogic.set_resourcemanager(resourcemanager)
     gamelogic.set_savemanager(savemanager)
     gamelogic.set_statemanager(statemanager)
     gamelogic.set_queuemanager(queuemanager)
@@ -35,13 +38,15 @@ def main():
     buildingmanager.set_turnmanager(turnmanager)
     buildingmanager.set_queuemanager(queuemanager)
 
+    resourcemanager.set_statemanager(statemanager)
+
     savemanager.set_gamelogic(gamelogic)
     savemanager.set_buildingmanager(buildingmanager)
     savemanager.set_statemanager(statemanager)
     savemanager.set_turnmanager(turnmanager)
     savemanager.set_queuemanager(queuemanager)
 
-    app = GUI(root, gamelogic, buildingmanager, queuemanager, turnmanager, savemanager, statemanager)
+    app = GUI(root, gamelogic, buildingmanager, queuemanager, turnmanager, resourcemanager, savemanager, statemanager)
     buildingmanager.set_guimanager(app)
     gamelogic.set_guimanager(app)
     savemanager.set_guimanager(app)
@@ -73,6 +78,10 @@ class GameLogic():
         self.buildingmanager = buildingmanager
 
 
+    def set_resourcemanager(self, resourcemanager):
+        self.resourcemanager = resourcemanager
+
+
     def set_savemanager(self, savemanager):
         self.savemanager = savemanager
 
@@ -89,6 +98,7 @@ class GameLogic():
     def run_simulation(self):
         if self.statemanager.turn_number < 100:
             self.turnmanager.increase_game_turns()
+            self.resourcemanager.increase_energy_resource()
             self.turnmanager.decrease_building_turns()
             self.queuemanager.set_building_queue_names()
             # self.buildingmanager.set_building_queue_turns()

@@ -7,6 +7,7 @@ class Building():
     def __init__(self, properties):
         self.name = properties["Name"]
         self.turns = properties["Turn amount"]
+        self.cost = properties["Cost"]
 
 
     def get_name(self):
@@ -15,6 +16,10 @@ class Building():
 
     def get_turns(self):
         return self.turns
+
+
+    def get_cost(self):
+        return self.cost
 
 
     def decrease_turns(self):
@@ -67,7 +72,12 @@ class BuildingManager:
 
     # Sets initial properties for buildings and instanciates them.
     def set_building_properties(self):
-        self.building_properties = [{"Name" : "Air purifier", "Turn amount" : 4}, {"Name" : "House", "Turn amount" : 5}, {"Name" : "Robot factory", "Turn amount" : 7}, {"Name" : "Water purifier", "Turn amount" : 4}]
+        self.building_properties = [
+            {"Name" : "Air purifier", "Turn amount" : 4, "Cost" : "50"},
+            {"Name" : "House", "Turn amount" : 5, "Cost" : "10"},
+            {"Name" : "Robot factory", "Turn amount" : 7, "Cost" : "120"},
+            {"Name" : "Water purifier", "Turn amount" : 4, "Cost" : "50"}
+        ]
         self.set_building_names()
 
         self.air_purifier = Building(properties = self.get_building_properties("Air purifier"))
@@ -83,6 +93,13 @@ class BuildingManager:
         for building in self.building_properties:
             if building["Name"] == name:
                 return building
+        return None
+
+
+    def get_building_cost(self, name):
+        for building in self.building_properties:
+            if building["Name"] == name:
+                return int(building["Cost"])
         return None
 
 
@@ -115,7 +132,7 @@ class BuildingManager:
         if selection:
             selection_id = int(selection[0])
             if self.buildings_names_list[selection_id] == "Air purifier":
-                self.building_descriptionStringVar.set("Air purifier\ndescription")
+                self.building_descriptionStringVar.set("Air purifier\ncost: {}".format(self.get_building_cost("Air purifier")))
             elif self.buildings_names_list[selection_id] == "House":
                 self.building_descriptionStringVar.set("House\ndescription")
             elif self.buildings_names_list[selection_id] == "Robot factory":
@@ -163,14 +180,17 @@ class BuildingManager:
 
 
     # Controls what happens when double clicking an item in the building list.
-    def add_buildings(self, buildingsListbox):
-        selection = buildingsListbox.curselection()
-        selection_id = int(selection[0])
-        self.queuemanager.add_to_building_queue(selection_id)
-        self.set_building_queue_turns()
-        self.turnmanager.set_turns_left_building_queue()
-        self.set_building_construction()
-        self.guimanager.set_building_queueScrollbar_visibility()
+    def add_buildings(self):
+        selection_id = self.guimanager.get_buildingsListbox_selection()
+        print("selection_id in BuildingManager.add_buildings(): ", selection_id)
+        if self.statemanager.energy_resource > self.get_building_cost(self.buildings_names_list[selection_id]):
+            self.queuemanager.add_to_building_queue(selection_id)
+            self.set_building_queue_turns()
+            self.turnmanager.set_turns_left_building_queue()
+            self.set_building_construction()
+            self.guimanager.set_building_queueScrollbar_visibility()
+        else:
+            print("Insufficient energy to build!")
 
 
     # This defines what happens when finishing building something.

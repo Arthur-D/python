@@ -7,6 +7,8 @@ class StateManager:
         self.turn_number = 1
         self.turns_left_building_queue = 0
 
+        self.energy_resource = 100
+
         self.air_purifier_amount = 0
         self.house_amount = 0
         self.robot_factory_amount = 0
@@ -21,6 +23,10 @@ class StateManager:
 
     def set_turns_left_building_queue(self, turns):
         self.turns_left_building_queue = turns
+
+
+    def set_energy_resource(self, amount):
+        self.energy_resource = amount
 
 
     def set_air_purifier_amount(self, amount):
