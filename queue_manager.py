@@ -18,6 +18,10 @@ class QueueManager():
         self.guimanager = guimanager
 
 
+    def set_resourcemanager(self, resourcemanager):
+        self.resourcemanager = resourcemanager
+
+
     def set_turnmanager(self, turnmanager):
         self.turnmanager = turnmanager
 
@@ -56,6 +60,8 @@ class QueueManager():
         if self.building_queue and len(selection) == 1:
             selection_id = int(selection[0])
             self.buildingmanager.set_previous_building()
+            print("self.building_queue[selection_id].get_name() in QueueManager.delete_from_building_queue: ", self.building_queue[selection_id].get_name())
+            self.resourcemanager.increase_resources(self.buildingmanager.get_building_cost(self.building_queue[selection_id].get_name()))
             self.building_queue.pop(selection_id)
             self.set_building_queue_names()
             self.buildingmanager.set_building_construction()

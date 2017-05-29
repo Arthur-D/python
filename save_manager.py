@@ -21,6 +21,10 @@ class SaveManager:
         self.buildingmanager = buildingmanager
 
 
+    def set_resourcemanager(self, resourcemanager):
+        self.resourcemanager = resourcemanager
+
+
     def set_statemanager(self, statemanager):
         self.statemanager = statemanager
 
@@ -80,6 +84,7 @@ class SaveManager:
         print("Saving game as %s" % save_name)
         saveFile = shelve.open("Saves/%s" % save_name)
         saveFile["StateManager.turn_number"] = self.statemanager.turn_number
+        saveFile["StateManager.energy_resource"] = self.statemanager.energy_resource
         saveFile["BuildingManager.building_amountsStringVar"] = self.buildingmanager.building_amountsStringVar.get()
 
         saveFile["QueueManager.building_queue"] = self.queuemanager.building_queue
@@ -91,6 +96,7 @@ class SaveManager:
     def load_game_state(self, save_name):
         saveFile = shelve.open("Saves/%s" % save_name)
         self.turn_number = saveFile["StateManager.turn_number"]
+        self.energy_resource = saveFile["StateManager.energy_resource"]
         self.building_amountsStringVar = saveFile["BuildingManager.building_amountsStringVar"]
 
         self.building_queue = saveFile["QueueManager.building_queue"]
@@ -101,6 +107,7 @@ class SaveManager:
     # Sets the game state again after loading a game. Also resets GUI StringVars.
     def set_game_state(self):
         self.statemanager.set_turn_number(self.turn_number)
+        self.statemanager.set_energy_resource(self.energy_resource)
         self.buildingmanager.set_finished_buildings()
         self.queuemanager.set_building_queue(self.building_queue)
         self.queuemanager.set_building_queue_names()
@@ -111,6 +118,7 @@ class SaveManager:
 
         # Resetting the labels when loading.
         self.turnmanager.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
+        self.resourcemanager.energy_resourceStringVar.set("Energy: {}".format(self.statemanager.energy_resource))
         self.buildingmanager.building_amountsStringVar.set(self.building_amountsStringVar)
         self.buildingmanager.built_buildingStringVar.set("")
         self.buildingmanager.building_descriptionStringVar.set("")

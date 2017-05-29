@@ -58,6 +58,10 @@ class BuildingManager:
         self.set_building_turns()
 
 
+    def set_resourcemanager(self, resourcemanager):
+        self.resourcemanager = resourcemanager
+
+
     def set_guimanager(self, guimanager):
         self.guimanager = guimanager
 
@@ -73,10 +77,10 @@ class BuildingManager:
     # Sets initial properties for buildings and instanciates them.
     def set_building_properties(self):
         self.building_properties = [
-            {"Name" : "Air purifier", "Turn amount" : 4, "Cost" : "50"},
-            {"Name" : "House", "Turn amount" : 5, "Cost" : "10"},
-            {"Name" : "Robot factory", "Turn amount" : 7, "Cost" : "120"},
-            {"Name" : "Water purifier", "Turn amount" : 4, "Cost" : "50"}
+            {"Name" : "Air purifier", "Turn amount" : 4, "Cost" : "80"},
+            {"Name" : "House", "Turn amount" : 5, "Cost" : "25"},
+            {"Name" : "Robot factory", "Turn amount" : 7, "Cost" : "200"},
+            {"Name" : "Water purifier", "Turn amount" : 4, "Cost" : "80"}
         ]
         self.set_building_names()
 
@@ -134,11 +138,11 @@ class BuildingManager:
             if self.buildings_names_list[selection_id] == "Air purifier":
                 self.building_descriptionStringVar.set("Air purifier\ncost: {}".format(self.get_building_cost("Air purifier")))
             elif self.buildings_names_list[selection_id] == "House":
-                self.building_descriptionStringVar.set("House\ndescription")
+                self.building_descriptionStringVar.set("House\ncost: {}".format(self.get_building_cost("House")))
             elif self.buildings_names_list[selection_id] == "Robot factory":
-                self.building_descriptionStringVar.set("Robot factory\ndescription")
+                self.building_descriptionStringVar.set("Robot factory\ncost: {}".format(self.get_building_cost("Robot factory")))
             elif self.buildings_names_list[selection_id] == "Water purifier":
-                self.building_descriptionStringVar.set("Water purifier\ndescription")
+                self.building_descriptionStringVar.set("Water purifier\ncost: {}".format(self.get_building_cost("Water purifier")))
             else:
                 self.building_descriptionStringVar.set("")
 
@@ -183,7 +187,8 @@ class BuildingManager:
     def add_buildings(self):
         selection_id = self.guimanager.get_buildingsListbox_selection()
         print("selection_id in BuildingManager.add_buildings(): ", selection_id)
-        if self.statemanager.energy_resource > self.get_building_cost(self.buildings_names_list[selection_id]):
+        if self.statemanager.energy_resource >= self.get_building_cost(self.buildings_names_list[selection_id]):
+            self.resourcemanager.decrease_resources(self.get_building_cost(self.buildings_names_list[selection_id]))
             self.queuemanager.add_to_building_queue(selection_id)
             self.set_building_queue_turns()
             self.turnmanager.set_turns_left_building_queue()

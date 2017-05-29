@@ -15,3 +15,12 @@ class ResourceManager:
         amount = self.statemanager.energy_resource + 5
         self.statemanager.set_energy_resource(amount)
         self.energy_resourceStringVar.set("Energy: {}".format(self.statemanager.energy_resource))
+
+
+    def increase_resources(self, amount):
+        self.statemanager.set_energy_resource(self.statemanager.energy_resource + amount)
+        self.energy_resourceStringVar.set("Energy: {}".format(self.statemanager.energy_resource))
+
+    def decrease_resources(self, amount):
+        self.statemanager.set_energy_resource(self.statemanager.energy_resource - amount)
+        self.energy_resourceStringVar.set("Energy: {}".format(self.statemanager.energy_resource))

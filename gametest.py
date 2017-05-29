@@ -29,12 +29,14 @@ def main():
     gamelogic.set_queuemanager(queuemanager)
 
     queuemanager.set_buildingmanager(buildingmanager)
+    queuemanager.set_resourcemanager(resourcemanager)
     queuemanager.set_turnmanager(turnmanager)
 
     turnmanager.set_buildingmanager(buildingmanager)
     turnmanager.set_statemanager(statemanager)
     turnmanager.set_queuemanager(queuemanager)
 
+    buildingmanager.set_resourcemanager(resourcemanager)
     buildingmanager.set_turnmanager(turnmanager)
     buildingmanager.set_queuemanager(queuemanager)
 
@@ -42,6 +44,7 @@ def main():
 
     savemanager.set_gamelogic(gamelogic)
     savemanager.set_buildingmanager(buildingmanager)
+    savemanager.set_resourcemanager(resourcemanager)
     savemanager.set_statemanager(statemanager)
     savemanager.set_turnmanager(turnmanager)
     savemanager.set_queuemanager(queuemanager)
