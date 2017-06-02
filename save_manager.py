@@ -95,13 +95,21 @@ class SaveManager:
     # Loads a game from the saved_games list and sets temporary variables. See set_game_state for setting the game's variables.
     def load_game_state(self, save_name):
         saveFile = shelve.open("Saves/%s" % save_name)
-        self.turn_number = saveFile["StateManager.turn_number"]
-        self.energy_resource = saveFile["StateManager.energy_resource"]
-        self.building_amountsStringVar = saveFile["BuildingManager.building_amountsStringVar"]
+        try:
+            self.turn_number = saveFile["StateManager.turn_number"]
+            self.energy_resource = saveFile["StateManager.energy_resource"]
+            self.building_amountsStringVar = saveFile["BuildingManager.building_amountsStringVar"]
 
-        self.building_queue = saveFile["QueueManager.building_queue"]
-        self.saved_playernameStringVar = saveFile["GameLogic.playernameStringVar"]
-        saveFile.close()
+            self.building_queue = saveFile["QueueManager.building_queue"]
+            self.saved_playernameStringVar = saveFile["GameLogic.playernameStringVar"]
+        except:
+            print("Could not load save {}".format(save_name))
+            self.gamelogic.set_game_statusStringVar("red", "Could not load save\n{}".format(save_name))
+        else:
+            self.set_game_state()
+            self.gamelogic.set_game_statusStringVar("green", "Loaded save\n{}".format(save_name))
+        finally:
+            saveFile.close()
 
 
     # Sets the game state again after loading a game. Also resets GUI StringVars.

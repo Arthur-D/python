@@ -43,6 +43,7 @@ class BuildingManager:
 
         self.buildingsStringVar = StringVar()
         self.building_descriptionStringVar = StringVar()
+        self.building_errorStringVar = StringVar()
         self.building_buildingStringVar = StringVar()
         self.building_building_turnsStringVar = StringVar()
         self.built_buildingStringVar = StringVar()
@@ -60,6 +61,10 @@ class BuildingManager:
 
     def set_resourcemanager(self, resourcemanager):
         self.resourcemanager = resourcemanager
+
+
+    def set_gamelogic(self, gamelogic):
+        self.gamelogic = gamelogic
 
 
     def set_guimanager(self, guimanager):
@@ -186,7 +191,6 @@ class BuildingManager:
     # Controls what happens when double clicking an item in the building list.
     def add_buildings(self):
         selection_id = self.guimanager.get_buildingsListbox_selection()
-        print("selection_id in BuildingManager.add_buildings(): ", selection_id)
         if self.statemanager.energy_resource >= self.get_building_cost(self.buildings_names_list[selection_id]):
             self.resourcemanager.decrease_resources(self.get_building_cost(self.buildings_names_list[selection_id]))
             self.queuemanager.add_to_building_queue(selection_id)
@@ -195,7 +199,7 @@ class BuildingManager:
             self.set_building_construction()
             self.guimanager.set_building_queueScrollbar_visibility()
         else:
-            print("Insufficient energy to build!")
+            self.gamelogic.set_game_statusStringVar("red", "Not enough\nresources to build!")
 
 
     # This defines what happens when finishing building something.

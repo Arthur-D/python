@@ -54,8 +54,4 @@ class TurnManager():
         turn_number += 1
         self.statemanager.set_turn_number(turn_number)
         self.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
-        if self.guimanager.confirmButton.winfo_viewable():
-            print("Aborting action needing confirmation")
-            self.guimanager.abort()
-        self.guimanager.building_queueListbox.see(len(self.queuemanager.building_queue) - 1)
         print("Turn", self.statemanager.turn_number)

@@ -7,7 +7,7 @@ class StateManager:
         self.turn_number = 1
         self.turns_left_building_queue = 0
 
-        self.energy_resource = 100
+        self.energy_resource = 500
 
         self.air_purifier_amount = 0
         self.house_amount = 0

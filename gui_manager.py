@@ -205,6 +205,7 @@ class GUI(Frame):
         self.building_queueListbox.configure(yscrollcommand = self.building_queueScrollbar.set)
 
         # Creating labels.
+        self.game_statusLabel = ttk.Label(self, font = "TkTooltipFont", textvariable = self.gamelogic.game_statusStringVar)
         self.add_buildingsLabel = ttk.Label(self, text = "Add building")
         self.turnLabel = ttk.Label(self, textvariable = self.turnmanager.turn_numberStringVar)
         self.building_queueLabel = ttk.Label(self, text = "Building queue")
@@ -230,6 +231,7 @@ class GUI(Frame):
         # Row 0:
         self.resourcesLabelframe.grid(row = 0, column = 0, columnspan = 7, sticky = W)
         self.energy_resourceLabel.grid(row = 0, column = 1, sticky = W)
+        self.game_statusLabel.grid(row = 0, column = 2)
         self.saved_nameLabel.grid(row = 0, column = 8, sticky = W)
         self.turnLabel.grid(row = 0, column = 8, sticky = E)
 

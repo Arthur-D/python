@@ -1,3 +1,6 @@
+import time
+import threading
+
 from gui_manager import *
 from queue_manager import *
 from tkinter import *
@@ -24,6 +27,7 @@ def main():
     gamelogic.set_turnmanager(turnmanager)
     gamelogic.set_buildingmanager(buildingmanager)
     gamelogic.set_resourcemanager(resourcemanager)
+    gamelogic.set_root(root)
     gamelogic.set_savemanager(savemanager)
     gamelogic.set_statemanager(statemanager)
     gamelogic.set_queuemanager(queuemanager)
@@ -36,6 +40,7 @@ def main():
     turnmanager.set_statemanager(statemanager)
     turnmanager.set_queuemanager(queuemanager)
 
+    buildingmanager.set_gamelogic(gamelogic)
     buildingmanager.set_resourcemanager(resourcemanager)
     buildingmanager.set_turnmanager(turnmanager)
     buildingmanager.set_queuemanager(queuemanager)
@@ -59,9 +64,26 @@ def main():
 
 
 
+# Object for creating threads. Not in use and may be deleted later.
+class ThreadObject (threading.Thread):
+    def __init__(self, threadID, name, counter):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.counter = counter
+
+
+    def run(self):
+        print("Starting ", self.name)
+        time.sleep(3)
+        print("Exiting ", self.name)
+
+
+
 # High level class getting the simulation started.
 class GameLogic():
     def __init__(self):
+        self.game_statusStringVar = StringVar()
         self.playernameStringVar = StringVar()
         self.error_playernameStringVar = StringVar()
         self.saved_playernameStringVar = StringVar()
@@ -85,6 +107,10 @@ class GameLogic():
         self.resourcemanager = resourcemanager
 
 
+    def set_root(self, root):
+        self.root = root
+
+
     def set_savemanager(self, savemanager):
         self.savemanager = savemanager
 
@@ -104,9 +130,20 @@ class GameLogic():
             self.resourcemanager.increase_energy_resource()
             self.turnmanager.decrease_building_turns()
             self.queuemanager.set_building_queue_names()
-            # self.buildingmanager.set_building_queue_turns()
+            if self.guimanager.confirmButton.winfo_viewable():
+                print("Aborting action needing confirmation")
+                self.guimanager.abort()
+            self.guimanager.building_queueListbox.see(len(self.queuemanager.building_queue) - 1)
+            self.buildingmanager.building_errorStringVar.set("")
         else:
             print("Turn number is 100, game over")
+
+
+    def set_game_statusStringVar(self, color, content):
+        self.guimanager.game_statusLabel.grid()
+        self.guimanager.game_statusLabel["foreground"] = color
+        self.game_statusStringVar.set(content)
+        self.root.after(5000, lambda: self.guimanager.game_statusLabel.grid_remove())
 
 
     # Logic for saving playername to labels in GUI.
@@ -151,11 +188,11 @@ class GameLogic():
         selection = saved_gamesCombobox.current()
         if selection > -1:
             save_game = self.savemanager.saved_games[selection]
-            self.savemanager.load_game_state(save_game)
-            self.savemanager.set_game_state()
             print("Loading save '%s'" % save_game)
+            self.savemanager.load_game_state(save_game)
         else:
             print("Select a save game!")
+            self.game_statusStringVar.set("Select a save game")
 
 
     def delete_saved_game(self, saved_gamesCombobox):
