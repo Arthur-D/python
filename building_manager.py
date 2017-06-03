@@ -32,29 +32,23 @@ class Building():
 
 # Class for handling the buildings.
 class BuildingManager:
-    def __init__(self, statemanager):
+    def __init__(self):
         self.buildings_names = ""
         self.buildings_names_list = []
         self.building_turns = ""
         self.previous_building = ""
-        self.finished_buildings = []
         self.finished_buildings_names = []
-        self.finished_buildings_amounts = {}
 
         self.buildingsStringVar = StringVar()
         self.building_descriptionStringVar = StringVar()
         self.building_errorStringVar = StringVar()
-        self.building_buildingStringVar = StringVar()
-        self.building_building_turnsStringVar = StringVar()
         self.built_buildingStringVar = StringVar()
-        self.building_amountsStringVar = StringVar()
         self.building_turnsStringVar = StringVar()
         self.air_purifier_amountStringVar = StringVar()
         self.house_amountStringVar = StringVar()
         self.robot_factory_amountStringVar = StringVar()
         self.water_purifier_amountStringVar = StringVar()
 
-        self.statemanager = statemanager
         self.set_building_properties()
         self.set_building_turns()
 
@@ -69,6 +63,10 @@ class BuildingManager:
 
     def set_guimanager(self, guimanager):
         self.guimanager = guimanager
+
+
+    def set_statemanager(self, statemanager):
+        self.statemanager = statemanager
 
 
     def set_turnmanager(self, turnmanager):
@@ -112,14 +110,6 @@ class BuildingManager:
         return None
 
 
-    # Returns the foremost building instance in the building queue.
-    def get_currently_building(self):
-        if self.queuemanager.building_queue:
-            return self.queuemanager.building_queue[self.get_currently_building_index()]
-        else:
-            return None
-
-
     # Populate the list of possible buildings to build, both for display purposes and also in an actual list.
     def set_building_names(self):
         for building_property in self.building_properties:
@@ -152,40 +142,12 @@ class BuildingManager:
                 self.building_descriptionStringVar.set("")
 
 
-    # Similar to set_buildings_list() but is for the buildings that are in the building queue.
-    def set_building_queue_turns(self):
-        building_queue_turns = ""
-        for building in self.queuemanager.building_queue:
-            building_queue_turns += "%s" % building.get_turns()
-        self.building_building_turnsStringVar.set(building_queue_turns)
-
-
-    # For getting the name of the foremost building in the queue.
-    def get_currently_building_name(self):
-        if self.queuemanager.building_queue:
-            return self.queuemanager.building_queue[len(self.queuemanager.building_queue) - 1].get_name()
-
-
-    # For getting the index of the foremost building in the queue.
-    def get_currently_building_index(self):
-        if self.queuemanager.building_queue:
-            return len(self.queuemanager.building_queue) - 1
-
-
     # Sets what the previous building in the queue were, for showing what has just finished building.
     def set_previous_building(self):
-        if self.get_currently_building_name():
-            self.previous_building = self.get_currently_building_name()
+        if self.queuemanager.get_currently_building_name():
+            self.previous_building = self.queuemanager.get_currently_building_name()
         else:
             self.previous_building = None
-
-
-    # Sets what building is currently being constructed for display purposes only.
-    def set_building_construction(self):
-        if self.get_currently_building_name():
-            self.building_buildingStringVar.set("Building %s" % self.get_currently_building_name())
-        else:
-            self.building_buildingStringVar.set("")
 
 
     # Controls what happens when double clicking an item in the building list.
@@ -194,9 +156,9 @@ class BuildingManager:
         if self.statemanager.energy_resource >= self.get_building_cost(self.buildings_names_list[selection_id]):
             self.resourcemanager.decrease_resources(self.get_building_cost(self.buildings_names_list[selection_id]))
             self.queuemanager.add_to_building_queue(selection_id)
-            self.set_building_queue_turns()
+            self.guimanager.set_building_queue_turns()
             self.turnmanager.set_turns_left_building_queue()
-            self.set_building_construction()
+            self.guimanager.set_building_construction()
             self.guimanager.set_building_queueScrollbar_visibility()
         else:
             self.gamelogic.set_game_statusStringVar("red", "Not enough\nresources to build!")
@@ -207,23 +169,10 @@ class BuildingManager:
         self.set_previous_building()
         if self.previous_building:
             self.built_buildingStringVar.set("Built %s" % self.previous_building)
-        self.set_finished_buildings()
+        self.queuemanager.set_finished_buildings()
+        self.guimanager.set_finished_buildings_amounts()
         self.queuemanager.remove_from_building_queue()
-        self.set_building_construction()
+        self.guimanager.set_building_construction()
         self.turnmanager.set_turns_left_building_queue()
-        self.set_building_queue_turns()
+        self.guimanager.set_building_queue_turns()
         self.guimanager.set_building_queueScrollbar_visibility()
-
-
-    def set_finished_buildings(self):
-        if self.get_currently_building_index() != None:
-            self.finished_buildings.append(self.queuemanager.building_queue[self.get_currently_building_index()])
-        building_amounts = ""
-        building_names = [building.get_name() for building in self.finished_buildings]
-        for building_name in self.buildings_names_list:
-            self.finished_buildings_amounts[building_name] = building_names.count(building_name)
-            if building_name.endswith("y"):
-                building_amounts += "{}ies:{:4}\n".format(building_name[:-1], building_names.count(building_name))
-            else:
-                building_amounts += "{}s:{:4}\n".format(building_name, building_names.count(building_name))
-        self.building_amountsStringVar.set(building_amounts.rstrip("\n"))

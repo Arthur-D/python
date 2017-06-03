@@ -28,7 +28,7 @@ class TurnManager():
     # Decreases the amount of turns for the foremost building in the queue if End turn_number button is pressed.
     def decrease_building_turns(self):
         if self.queuemanager.building_queue:
-            building = self.queuemanager.building_queue[self.buildingmanager.get_currently_building_index()]
+            building = self.queuemanager.building_queue[self.queuemanager.get_currently_building_index()]
             building.decrease_turns()
             self.set_turns_left_building_queue()
             if building.get_turns() == 0:

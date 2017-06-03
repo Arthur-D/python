@@ -65,13 +65,13 @@ class SaveManager:
             self.saved_games.remove(save_name)
             if os.path.exists("Saves/%s" % save_name):
                 os.remove("Saves/%s" % save_name)
-            elif os.path.exists("Saves/%s.bak" % save_name):
+            if os.path.exists("Saves/%s.bak" % save_name):
                 os.remove("Saves/%s.bak" % save_name)
-            elif os.path.exists("Saves/%s.dat" % save_name):
+            if os.path.exists("Saves/%s.dat" % save_name):
                 os.remove("Saves/%s.dat" % save_name)
-            elif os.path.exists("Saves/%s.dir" % save_name):
+            if os.path.exists("Saves/%s.dir" % save_name):
                 os.remove("Saves/%s.dir" % save_name)
-            print("self.saved_games in SaveManager.delete_saved_game(): ", self.saved_games)
+            self.gamelogic.set_game_statusStringVar("red", "Deleted save \n{}".format(save_name))
         else:
             print("Can't find save '%s' in saved games list; not deleting!" % save_name)
 
@@ -90,6 +90,7 @@ class SaveManager:
         saveFile["QueueManager.building_queue"] = self.queuemanager.building_queue
         saveFile["GameLogic.playernameStringVar"] = self.gamelogic.saved_playernameStringVar.get()
         saveFile.close()
+        self.gamelogic.set_game_statusStringVar("green", "Saved game \n{}".format(save_name))
 
 
     # Loads a game from the saved_games list and sets temporary variables. See set_game_state for setting the game's variables.

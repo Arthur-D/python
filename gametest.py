@@ -20,7 +20,7 @@ def main():
     statemanager = StateManager()
     queuemanager = QueueManager()
     turnmanager = TurnManager()
-    buildingmanager = BuildingManager(statemanager)
+    buildingmanager = BuildingManager()
     resourcemanager = ResourceManager()
     savemanager = SaveManager()
 
@@ -42,6 +42,7 @@ def main():
 
     buildingmanager.set_gamelogic(gamelogic)
     buildingmanager.set_resourcemanager(resourcemanager)
+    buildingmanager.set_statemanager(statemanager)
     buildingmanager.set_turnmanager(turnmanager)
     buildingmanager.set_queuemanager(queuemanager)
 
@@ -88,7 +89,6 @@ class GameLogic():
         self.error_playernameStringVar = StringVar()
         self.saved_playernameStringVar = StringVar()
         self.save_nameStringVar = StringVar()
-        self.save_nameStringVar.set("gametest_save")
 
 
     def set_guimanager(self, guimanager):
@@ -169,6 +169,7 @@ class GameLogic():
                 self.set_saved_games(saved_gamesCombobox)
             else:
                 print("Error saving game: name empty!")
+                self.set_game_statusStringVar("red", "Save name empty")
         else:
             self.guimanager.show_confirm_and_abortButton()
             self.statemanager.set_confirm_function("save_game")
@@ -177,10 +178,12 @@ class GameLogic():
     def set_saved_games(self, saved_gamesCombobox):
         self.savemanager.set_saved_games()
         saved_gamesCombobox["values"] = self.savemanager.get_saved_games()
-        print("savemanager.get_saved_games() in GameLogic.set_saved_games(): ", self.savemanager.get_saved_games())
 
 
     def select_saved_game(self, saved_gamesCombobox):
+        selection = saved_gamesCombobox.current()
+        if selection > -1:
+            self.save_nameStringVar.set(self.savemanager.saved_games[selection])
         saved_gamesCombobox.select_clear()
 
 

@@ -22,6 +22,12 @@ class GUI(Frame):
         self.savemanager = savemanager
         self.statemanager = statemanager
 
+        self.building_buildingStringVar = StringVar()
+        self.building_building_turnsStringVar = StringVar()
+        self.building_amountsStringVar = StringVar()
+
+        self.finished_buildings_amounts = {}
+
         # Listing buildings you can build.
         self.buildingsListbox = Listbox(self, font = "TkFixedFont", width = 16, height = 10, background = "white", listvariable = self.buildingmanager.buildingsStringVar)
 
@@ -48,7 +54,8 @@ class GUI(Frame):
         self.set_widget_mouse_bindings()
         self.set_saved_games(self.saved_gamesCombobox)
 
-        self.buildingmanager.set_finished_buildings()
+        self.queuemanager.set_finished_buildings()
+        self.set_finished_buildings_amounts()
         self.turnmanager.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
         self.resourcemanager.energy_resourceStringVar.set("Energy: {}".format(self.statemanager.energy_resource))
 
@@ -56,6 +63,7 @@ class GUI(Frame):
     # Function for creating the window context.
     def initUI(self):
         self.parent.title("Gametest")
+        self._root().option_add("*tearOff", FALSE)
         self.pack(fill = BOTH, expand = True)
         self.centerWindow()
 
@@ -153,6 +161,34 @@ class GUI(Frame):
         self.gamelogic.save_playername(self.saved_nameLabel, self.error_playernameLabel)
 
 
+    # Sets what building is currently being constructed for display purposes only.
+    def set_building_construction(self):
+        if self.queuemanager.get_currently_building_name():
+            self.building_buildingStringVar.set("Building %s" % self.queuemanager.get_currently_building_name())
+        else:
+            self.building_buildingStringVar.set("")
+
+
+    # Similar to set_buildings_list() but is for the buildings that are in the building queue.
+    def set_building_queue_turns(self):
+        building_queue_turns = ""
+        for building in self.queuemanager.building_queue:
+            building_queue_turns += "%s" % building.get_turns()
+        self.building_building_turnsStringVar.set(building_queue_turns)
+
+
+    def set_finished_buildings_amounts(self):
+        building_amounts = ""
+        building_names = [building.get_name() for building in self.queuemanager.finished_buildings]
+        for building_name in self.buildingmanager.buildings_names_list:
+            self.finished_buildings_amounts[building_name] = building_names.count(building_name)
+            if building_name.endswith("y"):
+                building_amounts += "{}ies:{:4}\n".format(building_name[:-1], building_names.count(building_name))
+            else:
+                building_amounts += "{}s:{:4}\n".format(building_name, building_names.count(building_name))
+        self.building_amountsStringVar.set(building_amounts.rstrip("\n"))
+
+
     # Function with widget configuration. Currently unused.
     def set_UI_configuration(self):
         #time_leftMethod = time_left
@@ -186,7 +222,15 @@ class GUI(Frame):
 
     # Creating UI elements and setting their parameters. Note: some widgets are in the constructor __init__().
     def set_UI_widgets(self):
+        # Creating menubar.
+        # self.menu = Toplevel(self.parent)
+        self.menubar = Menu(self.parent)
+        self.parent["menu"] = self.menubar
+        self.menu_file = Menu(self.menubar)
+        self.menubar.add_cascade(menu = self.menu_file, label = "File")
+
         # Creating main buttons.
+        # self.resource_robotButton = ttk.Bu
         self.save_playernameButton = ttk.Button(self, text ="Save name", command = self.save_playername)
         self.save_gameButton = ttk.Button(self, text = "Save game", command = self.save_game)
         self.load_gameButton = ttk.Button(self, text = "Load game", command = self.load_game)
@@ -211,11 +255,11 @@ class GUI(Frame):
         self.building_queueLabel = ttk.Label(self, text = "Building queue")
         self.building_descriptionLabel = ttk.Label(self, textvariable = self.buildingmanager.building_descriptionStringVar)
         self.turns_left_building_queueLabel = ttk.Label(self, textvariable = self.turnmanager.turns_left_building_queueStringVar)
-        self.building_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.building_buildingStringVar)
+        self.building_buildingLabel = ttk.Label(self, textvariable = self.building_buildingStringVar)
         self.built_buildingLabel = ttk.Label(self, textvariable = self.buildingmanager.built_buildingStringVar)
 
 
-        self.building_amountsLabel = ttk.Label(self.buildingsLabelframe, justify = "right", textvariable = self.buildingmanager.building_amountsStringVar)
+        self.building_amountsLabel = ttk.Label(self.buildingsLabelframe, justify = "right", textvariable = self.building_amountsStringVar)
         self.air_purifier_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.air_purifier_amountStringVar)
         self.house_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.house_amountStringVar)
         self.robot_factory_amountLabel = ttk.Label(self.buildingsLabelframe, textvariable = self.buildingmanager.robot_factory_amountStringVar)
@@ -229,6 +273,7 @@ class GUI(Frame):
         self.grid(sticky = N + S + W + E)
 
         # Row 0:
+        # self.menubar.grid(row = 0, column = 0)
         self.resourcesLabelframe.grid(row = 0, column = 0, columnspan = 7, sticky = W)
         self.energy_resourceLabel.grid(row = 0, column = 1, sticky = W)
         self.game_statusLabel.grid(row = 0, column = 2)

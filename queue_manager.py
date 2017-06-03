@@ -8,6 +8,7 @@ class QueueManager():
     def __init__(self):
         self.building_queue = []
         self.building_queueStringVar = StringVar()
+        self.finished_buildings = []
 
 
     def set_buildingmanager(self, buildingmanager):
@@ -84,5 +85,30 @@ class QueueManager():
             building_queueListbox.selection_set(selection_id + 1)
             self.set_building_queue_names()
             self.guimanager.building_queueListbox.see(selection_id + 1)
-            self.buildingmanager.set_building_queue_turns()
-            self.buildingmanager.set_building_construction()
+            self.guimanager.set_building_queue_turns()
+            self.guimanager.set_building_construction()
+
+
+    # Returns the foremost building instance in the building queue.
+    def get_currently_building(self):
+        if self.building_queue:
+            return self.building_queue[self.get_currently_building_index()]
+        else:
+            return None
+
+
+    # For getting the index of the foremost building in the queue.
+    def get_currently_building_index(self):
+        if self.building_queue:
+            return len(self.building_queue) - 1
+
+
+    # For getting the name of the foremost building in the queue.
+    def get_currently_building_name(self):
+        if self.building_queue:
+            return self.building_queue[len(self.building_queue) - 1].get_name()
+
+
+    def set_finished_buildings(self):
+        if self.get_currently_building_index() != None:
+            self.finished_buildings.append(self.building_queue[self.get_currently_building_index()])
