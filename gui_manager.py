@@ -106,7 +106,8 @@ class GUI(Frame):
 
     def confirm(self):
         if self.statemanager.confirm_function == "delete_saved_game":
-            self.gamelogic.delete_saved_game(self.saved_gamesCombobox)
+            self.savemanager.delete_saved_game(self.gamelogic.save_name)
+            self.gamelogic.set_saved_games(self.saved_gamesCombobox)
             self.saved_gamesCombobox.set("Select saved game")
         elif self.statemanager.confirm_function == "save_game":
             self.savemanager.save_game_state(self.gamelogic.save_name)
@@ -137,11 +138,7 @@ class GUI(Frame):
 
 
     def delete_saved_game(self):
-        if self.saved_gamesCombobox.current() > -1:
-            self.show_confirm_and_abortButton()
-            self.statemanager.set_confirm_function("delete_saved_game")
-        else:
-            print("Select a save game!")
+        self.gamelogic.delete_saved_game(self.saved_gamesCombobox)
 
 
     def set_building_queueScrollbar_visibility(self):
@@ -228,6 +225,9 @@ class GUI(Frame):
         self.parent["menu"] = self.menubar
         self.menu_file = Menu(self.menubar)
         self.menubar.add_cascade(menu = self.menu_file, label = "File")
+        self.menu_file.add_command(label = "New", command = self.gamelogic.start_new_game)
+        self.menu_file.add_command(label = "Load", command = self.load_game)
+        self.menu_file.add_command(label = "Save", command = self.save_game)
 
         # Creating main buttons.
         # self.resource_robotButton = ttk.Bu

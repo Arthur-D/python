@@ -1,5 +1,7 @@
 import time
 import threading
+from os import execl
+from sys import executable
 
 from gui_manager import *
 from queue_manager import *
@@ -76,8 +78,9 @@ class ThreadObject (threading.Thread):
 
     def run(self):
         print("Starting ", self.name)
-        time.sleep(3)
-        print("Exiting ", self.name)
+        if __name__ == "__main__":
+            main()
+        # print("Exiting ", self.name)
 
 
 
@@ -121,6 +124,14 @@ class GameLogic():
 
     def set_queuemanager(self, queuemanager):
         self.queuemanager = queuemanager
+
+
+    def start_new_game(self):
+        # restart_thread = ThreadObject(1, "RestartThread", 1)
+        # restart_thread.start()
+        # self.root.destroy()
+        python = sys.executable
+        os.execl(python, python, *sys.argv)
 
 
     # This defines what happens when clicking End turn_number.
@@ -195,13 +206,18 @@ class GameLogic():
             self.savemanager.load_game_state(save_game)
         else:
             print("Select a save game!")
-            self.game_statusStringVar.set("Select a save game")
+            self.set_game_statusStringVar("red", "Select a save game")
 
 
     def delete_saved_game(self, saved_gamesCombobox):
-        save_game = self.savemanager.saved_games[saved_gamesCombobox.current()]
-        self.savemanager.delete_saved_game(save_game)
-        self.set_saved_games(saved_gamesCombobox)
+        selection = saved_gamesCombobox.current()
+        if selection > -1:
+            self.save_name = self.savemanager.saved_games[selection]
+            self.guimanager.show_confirm_and_abortButton()
+            self.statemanager.set_confirm_function("delete_saved_game")
+        else:
+            print("Select a save game!")
+            self.set_game_statusStringVar("red", "Select a save game")
 
 
 

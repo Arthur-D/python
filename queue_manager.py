@@ -65,7 +65,7 @@ class QueueManager():
             self.resourcemanager.increase_resources(self.buildingmanager.get_building_cost(self.building_queue[selection_id].get_name()))
             self.building_queue.pop(selection_id)
             self.set_building_queue_names()
-            self.buildingmanager.set_building_construction()
+            self.guimanager.set_building_construction()
         else:
             print("No more buildings to remove. Building queue empty.")
         self.turnmanager.set_turns_left_building_queue()
