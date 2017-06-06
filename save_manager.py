@@ -1,6 +1,7 @@
 import shelve
 import os
 import datetime
+import pdb
 from tkinter import StringVar
 
 
@@ -120,7 +121,7 @@ class SaveManager:
 
     def set_saved_game_infoStringVar(self):
         saved_game_info = ""
-        saveFile = shelve.open("Saves/{}".format(self.save_nameStringVar.get()))
+        saveFile = shelve.open("Saves/{}".format(self.save_nameStringVar.get()), flag = "r")
         try:
             if saveFile["GameLogic.playernameStringVar"] != "":
                 saved_game_info += "{}\n".format(saveFile["GameLogic.playernameStringVar"])
@@ -178,6 +179,7 @@ class SaveManager:
             if os.path.exists("Saves/{}.bak".format(save_name)):
                 try:
                     os.remove("Saves/{}.bak".format(save_name))
+                    # pdb.set_trace()
                 except OSError as error:
                     print("Failed with: ", error.strerror)
                     print("Error code: ", error.code)
