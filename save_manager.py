@@ -15,6 +15,7 @@ class SaveManager:
         self.saved_gamesStringVar = StringVar()
         self.save_nameStringVar = StringVar()
         self.saved_game_infoStringVar = StringVar()
+        self.save_statusStringVar = StringVar()
 
 
     def set_gamelogic(self, gamelogic):
@@ -31,6 +32,10 @@ class SaveManager:
 
     def set_resourcemanager(self, resourcemanager):
         self.resourcemanager = resourcemanager
+
+
+    def set_root(self, root):
+        self.root = root
 
 
     def set_statemanager(self, statemanager):
@@ -51,10 +56,11 @@ class SaveManager:
 
     def confirm(self):
         if self.confirm_function == "delete_saved_game":
+            print("self.guimanager.get_selection_saved_game in SaveManager.confirm(): ", self.guimanager.get_selection_saved_game)
             self.delete_saved_game(self.guimanager.get_selection_saved_game())
-            self.set_saved_games()
         elif self.confirm_function == "save_game":
             self.save_game_state(self.save_name)
+        self.set_saved_game_infoStringVar()
         self.abort()
 
 
@@ -70,6 +76,13 @@ class SaveManager:
         self.set_saved_game_infoStringVar()
 
 
+    def set_save_statusStringVar(self, color, content):
+        self.guimanager.save_statusLabel.grid(row = 3, column = 2, rowspan = 2)
+        self.guimanager.save_statusLabel["foreground"] = color
+        self.save_statusStringVar.set(content)
+        self.root.after(5000, lambda: self.guimanager.save_statusLabel.grid_remove())
+
+
     def save_game(self):
         self.save_name = str(self.save_nameStringVar.get())
         if self.save_name not in self.saved_games:
@@ -78,14 +91,10 @@ class SaveManager:
                 self.set_saved_games()
             else:
                 print("Error saving game: name empty!")
-                self.gamelogic.set_game_statusStringVar("red", "Save name empty")
+                self.set_save_statusStringVar("red", "Save name empty")
         else:
             self.guimanager.show_confirm_and_abortButton()
             self.set_confirm_function("save_game")
-        # print("selection_id in SaveManager: ", selection_id)
-        print("saved_gamesListbox.curselection in SaveManager.save_game:" , self.guimanager.saved_gamesListbox.curselection)
-        # self.guimanager.set_selection_saved_game(int(self.guimanager.saved_gamesListbox.curselection()[0]))
-        self.set_saved_game_infoStringVar()
 
 
     def load_game(self):
@@ -95,7 +104,7 @@ class SaveManager:
             self.load_game_state(selection_id)
         else:
             print("Select a save game!")
-            self.gamelogic.set_game_statusStringVar("red", "Select a save game")
+            self.set_save_statusStringVar("red", "Select a save game")
 
 
     def delete_game(self):
@@ -103,11 +112,9 @@ class SaveManager:
         if selection_id:
             self.guimanager.show_confirm_and_abortButton()
             self.set_confirm_function("delete_saved_game")
-            self.set_saved_game_infoStringVar()
         else:
             print("Select a save game!")
-            self.gamelogic.set_game_statusStringVar("red", "Select a save game")
-        print("selection_id in SaveManager: ", selection_id)
+            self.set_save_statusStringVar("red", "Select a save game")
 
 
     def set_saved_game_infoStringVar(self):
@@ -159,16 +166,41 @@ class SaveManager:
             print("Deleting save '%s'" % save_name)
             self.saved_games.remove(save_name)
             if os.path.exists("Saves/%s" % save_name):
-                os.remove("Saves/%s" % save_name)
+                try:
+                    os.remove("Saves/%s" % save_name)
+                except OSError as error:
+                    print("Failed with: ", error.strerror)
+                    print("Error code: ", error.code)
+                else:
+                    print("Deleted file {}".format(save_name))
             if os.path.exists("Saves/%s.bak" % save_name):
-                os.remove("Saves/%s.bak" % save_name)
+                try:
+                    os.remove("Saves/%s.bak" % save_name)
+                except OSError as error:
+                    print("Failed with: ", error.strerror)
+                    print("Error code: ", error.code)
+                else:
+                    print("Deleted file {}.bak".format(save_name))
             if os.path.exists("Saves/%s.dat" % save_name):
-                os.remove("Saves/%s.dat" % save_name)
+                try:
+                    os.remove("Saves/%s.dat" % save_name)
+                except OSError as error:
+                    print("Failed with: ", error.strerror)
+                    print("Error code: ", error.code)
+                else:
+                    print("Deleted file {}.dat".format(save_name))
             if os.path.exists("Saves/%s.dir" % save_name):
-                os.remove("Saves/%s.dir" % save_name)
-            self.gamelogic.set_game_statusStringVar("red", "Deleted save \n{}".format(save_name))
+                try:
+                    os.remove("Saves/%s.dir" % save_name)
+                except OSError as error:
+                    print("Failed with: ", error.strerror)
+                    print("Error code: ", error.code)
+                else:
+                    print("Deleted file {}.dir".format(save_name))
+            self.set_save_statusStringVar("red", "Deleted save {}".format(save_name))
         else:
             print("Can't find save '%s' in saved games list; not deleting!" % save_name)
+        self.set_saved_games()
 
 
     # For saving games. Makes sure there's a Saves folder to put them in. For Linux, one file without file extension is generated, while under Windows it will create .dat .dir and .bak files.
@@ -186,7 +218,7 @@ class SaveManager:
         saveFile["QueueManager.building_queue"] = self.queuemanager.building_queue
         saveFile["GameLogic.playernameStringVar"] = self.gamelogic.saved_playernameStringVar.get()
         saveFile.close()
-        self.gamelogic.set_game_statusStringVar("green", "Saved game \n{}".format(save_name))
+        self.set_save_statusStringVar("green", "Saved game {}".format(save_name))
 
 
     # Loads a game from the saved_games list and sets temporary variables. See set_game_state for setting the game's variables.
@@ -201,10 +233,10 @@ class SaveManager:
             self.saved_playernameStringVar = saveFile["GameLogic.playernameStringVar"]
         except KeyError:
             print("Could not load save {}".format(save_name))
-            self.gamelogic.set_game_statusStringVar("red", "Could not load save\n{}".format(save_name))
+            self.set_save_statusStringVar("red", "Could not load save {}".format(save_name))
         else:
             self.set_game_state()
-            self.gamelogic.set_game_statusStringVar("green", "Loaded save\n{}".format(save_name))
+            self.gamelogic.set_save_statusStringVar("green", "Loaded save\n{}".format(save_name))
         finally:
             saveFile.close()
 

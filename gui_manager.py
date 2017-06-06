@@ -109,6 +109,10 @@ class GUI(Frame):
         self.gamelogic.save_playername(self.saved_nameLabel, self.error_playernameLabel)
 
 
+    def load_game(self, saved_gamesListbox):
+        self.savemanager.load_game()
+
+
     # Sets what building is currently being constructed for display purposes only.
     def set_building_construction(self):
         if self.queuemanager.get_currently_building_name():
@@ -140,12 +144,14 @@ class GUI(Frame):
     def save_load_window(self):
         self.save_load_window = Toplevel(self.parent)
         self.save_load_window.title("Save/load game")
-        self.centerWindow(self.save_load_window, 320, 240)
+        self.centerWindow(self.save_load_window, 334, 126)
         self.save_load_window.focus()
+
+        self.save_load_window.columnconfigure(1, minsize = 15)
 
         self.save_gameEntry = ttk.Entry(self.save_load_window, width = 16, textvariable = self.savemanager.save_nameStringVar)
 
-        self.save_gameButton = ttk.Button(self.save_load_window, text = "Save game", command = self.savemanager.save_game)
+        self.save_gameButton = ttk.Button(self.save_load_window, text = "Save game", width = 10, command = self.savemanager.save_game)
         self.load_gameButton = ttk.Button(self.save_load_window, text = "Load game", command = self.savemanager.load_game)
         self.delete_saveButton = ttk.Button(self.save_load_window, text = "Delete save", command = self.savemanager.delete_game)
         self.confirmButton = ttk.Button(self.save_load_window, text = "Confirm", command = self.savemanager.confirm)
@@ -153,22 +159,23 @@ class GUI(Frame):
 
         self.saved_gamesLabel = Label(self.save_load_window, text = "Saved games")
         self.game_infoLabel = Label(self.save_load_window, text = "Game info")
+        self.save_statusLabel = Label(self.save_load_window, wraplength = 120, textvariable = self.savemanager.save_statusStringVar)
         self.saved_game_infoLabel = Label(self.save_load_window, width = 16, textvariable = self.savemanager.saved_game_infoStringVar)
 
-        self.saved_gamesListbox = Listbox(self.save_load_window, width = 16, height = 8, listvariable = self.savemanager.saved_gamesStringVar)
+        self.saved_gamesListbox = Listbox(self.save_load_window, width = 16, height = 6, listvariable = self.savemanager.saved_gamesStringVar)
         self.saved_gamesListbox.bind("<<ListboxSelect>>", self.savemanager.set_save_name_from_selection)
-        self.saved_gamesListbox.bind("<Double-1>", self.savemanager.load_game)
+        self.saved_gamesListbox.bind("<Double-1>", self.load_game)
         self.saved_gamesScrollbar = ttk.Scrollbar(self.save_load_window, orient = VERTICAL, command = self.saved_gamesListbox.yview)
         self.saved_gamesListbox.configure(yscrollcommand = self.saved_gamesScrollbar.set)
 
         self.saved_gamesLabel.grid(row = 0, column = 0)
         self.game_infoLabel.grid(row = 0, column = 2)
-        self.saved_gamesListbox.grid(row = 1, column = 0)
-        self.saved_game_infoLabel.grid(row = 1, column = 2)
-        self.save_gameEntry.grid(row = 5, column = 0, sticky = N)
-        self.save_gameButton.grid(row = 4, column = 0, sticky = N)
-        self.load_gameButton.grid(row = 2, column = 0, sticky = N)
-        self.delete_saveButton.grid(row = 3, column = 0, sticky = N)
+        self.saved_gamesListbox.grid(row = 1, column = 0, rowspan = 6)
+        self.saved_game_infoLabel.grid(row = 1, column = 2, rowspan = 2, sticky = N)
+        self.save_gameEntry.grid(row = 4, column = 3, sticky = S)
+        self.save_gameButton.grid(row = 3, column = 3, sticky = N)
+        self.load_gameButton.grid(row = 1, column = 3, sticky = N)
+        self.delete_saveButton.grid(row = 2, column = 3, sticky = N)
 
         self.savemanager.set_saved_games()
 
@@ -187,12 +194,12 @@ class GUI(Frame):
 
     def show_confirm_and_abortButton(self):
         self.abortButton.grid(row = 4, column = 2)
-        self.confirmButton.grid(row = 2, column = 2)
+        self.confirmButton.grid(row = 3, column = 2)
 
 
     def set_saved_gamesScrollbar_visibility(self):
         if self.saved_gamesListbox.size() > self.saved_gamesListbox.cget("height"):
-            self.saved_gamesScrollbar.grid(row = 1, column = 1, sticky = (NW, S))
+            self.saved_gamesScrollbar.grid(row = 1, column = 1, rowspan = 4, sticky = (NW, S))
         else:
             self.saved_gamesScrollbar.grid_remove()
 

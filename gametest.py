@@ -52,6 +52,7 @@ def main():
     savemanager.set_gamelogic(gamelogic)
     savemanager.set_buildingmanager(buildingmanager)
     savemanager.set_resourcemanager(resourcemanager)
+    savemanager.set_root(root)
     savemanager.set_statemanager(statemanager)
     savemanager.set_turnmanager(turnmanager)
     savemanager.set_queuemanager(queuemanager)
