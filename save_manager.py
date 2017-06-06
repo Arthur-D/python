@@ -15,7 +15,6 @@ class SaveManager:
         self.saved_gamesStringVar = StringVar()
         self.save_nameStringVar = StringVar()
         self.saved_game_infoStringVar = StringVar()
-        self.save_statusStringVar = StringVar()
 
 
     def set_gamelogic(self, gamelogic):
@@ -42,6 +41,10 @@ class SaveManager:
         self.statemanager = statemanager
 
 
+    def set_saveandloadgui(self, saveandloadgui):
+        self.saveandloadgui = saveandloadgui
+
+
     def set_turnmanager(self, turnmanager):
         self.turnmanager = turnmanager
 
@@ -55,9 +58,10 @@ class SaveManager:
 
 
     def confirm(self):
+        print("self.confirm_function in SaveManager.confirm(): ", self.confirm_function)
         if self.confirm_function == "delete_saved_game":
-            print("self.guimanager.get_selection_saved_game in SaveManager.confirm(): ", self.guimanager.get_selection_saved_game)
-            self.delete_saved_game(self.guimanager.get_selection_saved_game())
+            print("self.saveandloadgui.get_selection_saved_game() in SaveManager.confirm(): ", self.saveandloadgui.get_selection_saved_game())
+            self.delete_saved_game(self.saveandloadgui.get_selection_saved_game())
         elif self.confirm_function == "save_game":
             self.save_game_state(self.save_name)
         self.set_saved_game_infoStringVar()
@@ -66,21 +70,14 @@ class SaveManager:
 
     def abort(self):
         self.set_confirm_function(None)
-        self.guimanager.confirmButton.grid_remove()
-        self.guimanager.abortButton.grid_remove()
+        self.saveandloadgui.confirmButton.grid_remove()
+        self.saveandloadgui.abortButton.grid_remove()
 
 
     def set_save_name_from_selection(self, selection):
-        selection_id = self.guimanager.get_selection_saved_game()
+        selection_id = self.saveandloadgui.get_selection_saved_game()
         self.save_nameStringVar.set(selection_id)
         self.set_saved_game_infoStringVar()
-
-
-    def set_save_statusStringVar(self, color, content):
-        self.guimanager.save_statusLabel.grid(row = 3, column = 2, rowspan = 2)
-        self.guimanager.save_statusLabel["foreground"] = color
-        self.save_statusStringVar.set(content)
-        self.root.after(5000, lambda: self.guimanager.save_statusLabel.grid_remove())
 
 
     def save_game(self):
@@ -91,30 +88,30 @@ class SaveManager:
                 self.set_saved_games()
             else:
                 print("Error saving game: name empty!")
-                self.set_save_statusStringVar("red", "Save name empty")
+                self.saveandloadgui.set_save_statusStringVar("red", "Save name empty")
         else:
-            self.guimanager.show_confirm_and_abortButton()
+            self.saveandloadgui.show_confirm_and_abortButton()
             self.set_confirm_function("save_game")
 
 
     def load_game(self):
-        selection_id = self.guimanager.get_selection_saved_game()
+        selection_id = self.saveandloadgui.get_selection_saved_game()
         if selection_id:
             print("Loading save '{}'".format(selection_id))
             self.load_game_state(selection_id)
         else:
             print("Select a save game!")
-            self.set_save_statusStringVar("red", "Select a save game")
+            self.saveandloadgui.set_save_statusStringVar("red", "Select a save game")
 
 
     def delete_game(self):
-        selection_id = self.guimanager.get_selection_saved_game()
+        selection_id = self.saveandloadgui.get_selection_saved_game()
         if selection_id:
-            self.guimanager.show_confirm_and_abortButton()
+            self.saveandloadgui.show_confirm_and_abortButton()
             self.set_confirm_function("delete_saved_game")
         else:
             print("Select a save game!")
-            self.set_save_statusStringVar("red", "Select a save game")
+            self.saveandloadgui.set_save_statusStringVar("red", "Select a save game")
 
 
     def set_saved_game_infoStringVar(self):
@@ -153,7 +150,7 @@ class SaveManager:
         for save in self.saved_games:
             saves += "{}\n".format(save)
         self.saved_gamesStringVar.set(saves)
-        self.guimanager.set_saved_gamesScrollbar_visibility()
+        self.saveandloadgui.set_saved_gamesScrollbar_visibility()
 
 
     def get_saved_games(self):
@@ -162,6 +159,7 @@ class SaveManager:
 
     # Function for deleting a save game. Only deletes files in the saved_games list with no file extension or with the Windows save game file extensions.
     def delete_saved_game(self, save_name):
+        print("save_name in SaveManager.delete_saved_game(): ", save_name)
         if save_name in self.saved_games:
             print("Deleting save '%s'" % save_name)
             self.saved_games.remove(save_name)
@@ -197,7 +195,7 @@ class SaveManager:
                     print("Error code: ", error.code)
                 else:
                     print("Deleted file {}.dir".format(save_name))
-            self.set_save_statusStringVar("red", "Deleted save {}".format(save_name))
+            self.saveandloadgui.set_save_statusStringVar("red", "Deleted save {}".format(save_name))
         else:
             print("Can't find save '%s' in saved games list; not deleting!" % save_name)
         self.set_saved_games()
@@ -218,7 +216,7 @@ class SaveManager:
         saveFile["QueueManager.building_queue"] = self.queuemanager.building_queue
         saveFile["GameLogic.playernameStringVar"] = self.gamelogic.saved_playernameStringVar.get()
         saveFile.close()
-        self.set_save_statusStringVar("green", "Saved game {}".format(save_name))
+        self.saveandloadgui.set_save_statusStringVar("green", "Saved game {}".format(save_name))
 
 
     # Loads a game from the saved_games list and sets temporary variables. See set_game_state for setting the game's variables.
@@ -233,10 +231,10 @@ class SaveManager:
             self.saved_playernameStringVar = saveFile["GameLogic.playernameStringVar"]
         except KeyError:
             print("Could not load save {}".format(save_name))
-            self.set_save_statusStringVar("red", "Could not load save {}".format(save_name))
+            self.saveandloadgui.set_save_statusStringVar("red", "Could not load save {}".format(save_name))
         else:
             self.set_game_state()
-            self.gamelogic.set_save_statusStringVar("green", "Loaded save\n{}".format(save_name))
+            self.gamelogic.set_game_statusStringVar("green", "Loaded save\n{}".format(save_name))
         finally:
             saveFile.close()
 

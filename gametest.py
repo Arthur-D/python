@@ -24,6 +24,7 @@ def main():
     buildingmanager = BuildingManager()
     resourcemanager = ResourceManager()
     savemanager = SaveManager()
+    saveandloadgui = SaveAndLoadGUI(root, savemanager)
 
     gamelogic.set_turnmanager(turnmanager)
     gamelogic.set_buildingmanager(buildingmanager)
@@ -53,11 +54,12 @@ def main():
     savemanager.set_buildingmanager(buildingmanager)
     savemanager.set_resourcemanager(resourcemanager)
     savemanager.set_root(root)
+    savemanager.set_saveandloadgui(saveandloadgui)
     savemanager.set_statemanager(statemanager)
     savemanager.set_turnmanager(turnmanager)
     savemanager.set_queuemanager(queuemanager)
 
-    app = GUI(root, gamelogic, buildingmanager, queuemanager, turnmanager, resourcemanager, savemanager, statemanager)
+    app = GUI(root, gamelogic, buildingmanager, queuemanager, turnmanager, resourcemanager, savemanager, statemanager, saveandloadgui)
     buildingmanager.set_guimanager(app)
     gamelogic.set_guimanager(app)
     savemanager.set_guimanager(app)

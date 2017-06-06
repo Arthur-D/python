@@ -5,7 +5,7 @@ from tkinter import ttk
 
 # Class containing the GUI definitions for tkinter and ttk.
 class GUI(Frame):
-    def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager, resourcemanager, savemanager, statemanager):
+    def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager, resourcemanager, savemanager, statemanager, saveandloadgui):
         # Creates the main frame and background color.
         Frame.__init__(self, parent, background = "#d9d9d9")
         self.parent = parent
@@ -20,6 +20,7 @@ class GUI(Frame):
         self.turnmanager = turnmanager
         self.resourcemanager = resourcemanager
         self.savemanager = savemanager
+        self.saveandloadgui = saveandloadgui
         self.statemanager = statemanager
 
         self.building_buildingStringVar = StringVar()
@@ -109,10 +110,6 @@ class GUI(Frame):
         self.gamelogic.save_playername(self.saved_nameLabel, self.error_playernameLabel)
 
 
-    def load_game(self, saved_gamesListbox):
-        self.savemanager.load_game()
-
-
     # Sets what building is currently being constructed for display purposes only.
     def set_building_construction(self):
         if self.queuemanager.get_currently_building_name():
@@ -139,69 +136,6 @@ class GUI(Frame):
             else:
                 building_amounts += "{}s:{:4}\n".format(building_name, building_names.count(building_name))
         self.building_amountsStringVar.set(building_amounts.rstrip("\n"))
-
-
-    def save_load_window(self):
-        self.save_load_window = Toplevel(self.parent)
-        self.save_load_window.title("Save/load game")
-        self.centerWindow(self.save_load_window, 334, 126)
-        self.save_load_window.focus()
-
-        self.save_load_window.columnconfigure(1, minsize = 15)
-
-        self.save_gameEntry = ttk.Entry(self.save_load_window, width = 16, textvariable = self.savemanager.save_nameStringVar)
-
-        self.save_gameButton = ttk.Button(self.save_load_window, text = "Save game", width = 10, command = self.savemanager.save_game)
-        self.load_gameButton = ttk.Button(self.save_load_window, text = "Load game", command = self.savemanager.load_game)
-        self.delete_saveButton = ttk.Button(self.save_load_window, text = "Delete save", command = self.savemanager.delete_game)
-        self.confirmButton = ttk.Button(self.save_load_window, text = "Confirm", command = self.savemanager.confirm)
-        self.abortButton = ttk.Button(self.save_load_window, text = "Abort", command = self.savemanager.abort)
-
-        self.saved_gamesLabel = Label(self.save_load_window, text = "Saved games")
-        self.game_infoLabel = Label(self.save_load_window, text = "Game info")
-        self.save_statusLabel = Label(self.save_load_window, wraplength = 120, textvariable = self.savemanager.save_statusStringVar)
-        self.saved_game_infoLabel = Label(self.save_load_window, width = 16, textvariable = self.savemanager.saved_game_infoStringVar)
-
-        self.saved_gamesListbox = Listbox(self.save_load_window, width = 16, height = 6, listvariable = self.savemanager.saved_gamesStringVar)
-        self.saved_gamesListbox.bind("<<ListboxSelect>>", self.savemanager.set_save_name_from_selection)
-        self.saved_gamesListbox.bind("<Double-1>", self.load_game)
-        self.saved_gamesScrollbar = ttk.Scrollbar(self.save_load_window, orient = VERTICAL, command = self.saved_gamesListbox.yview)
-        self.saved_gamesListbox.configure(yscrollcommand = self.saved_gamesScrollbar.set)
-
-        self.saved_gamesLabel.grid(row = 0, column = 0)
-        self.game_infoLabel.grid(row = 0, column = 2)
-        self.saved_gamesListbox.grid(row = 1, column = 0, rowspan = 6)
-        self.saved_game_infoLabel.grid(row = 1, column = 2, rowspan = 2, sticky = N)
-        self.save_gameEntry.grid(row = 4, column = 3, sticky = S)
-        self.save_gameButton.grid(row = 3, column = 3, sticky = N)
-        self.load_gameButton.grid(row = 1, column = 3, sticky = N)
-        self.delete_saveButton.grid(row = 2, column = 3, sticky = N)
-
-        self.savemanager.set_saved_games()
-
-
-    def get_selection_saved_game(self):
-        selection = self.saved_gamesListbox.curselection()
-        if selection:
-            selection_id = int(selection[0])
-            return self.savemanager.saved_games[selection_id]
-
-
-    def set_selection_saved_game(self, selection):
-        if len(self.savemanager.saved_games) > 0:
-            self.saved_gamesListbox.activate(selection)
-
-
-    def show_confirm_and_abortButton(self):
-        self.abortButton.grid(row = 4, column = 2)
-        self.confirmButton.grid(row = 3, column = 2)
-
-
-    def set_saved_gamesScrollbar_visibility(self):
-        if self.saved_gamesListbox.size() > self.saved_gamesListbox.cget("height"):
-            self.saved_gamesScrollbar.grid(row = 1, column = 1, rowspan = 4, sticky = (NW, S))
-        else:
-            self.saved_gamesScrollbar.grid_remove()
 
 
     # Function with widget configuration. Currently unused.
@@ -244,7 +178,7 @@ class GUI(Frame):
         self.menu_file = Menu(self.menubar)
         self.menubar.add_cascade(menu = self.menu_file, label = "File")
         self.menu_file.add_command(label = "New", command = self.gamelogic.start_new_game)
-        self.menu_file.add_command(label = "Load", command = self.save_load_window)
+        self.menu_file.add_command(label = "Load", command = self.saveandloadgui.save_load_window)
         self.menu_file.add_command(label = "Save", command = self.savemanager.save_game)
 
         # Creating main buttons.
@@ -337,3 +271,97 @@ class GUI(Frame):
         self.buildingsListbox.bind("<Double-1>", self.add_buildings)
         self.building_queueListbox.bind("<Double-1>", self.remove_from_building_queue)
         self.building_queueListbox.bind("<3>", self.move_in_building_queue)
+
+
+
+class SaveAndLoadGUI(Frame):
+    def __init__(self, parent, savemanager):
+        self.parent = parent
+        self.savemanager = savemanager
+
+        # Creates the main frame and background color.
+        Frame.__init__(self, parent, background = "#d9d9d9")
+        self.save_statusStringVar = StringVar()
+
+
+    # Creates the window in which the main frame and the rest is displayed. self.parent.geometry takes width, height, and then centers the window by checking for display resolution and then halving it to find the coordinates.
+    def centerWindow(self, window, w, h):
+        sw = window.winfo_screenwidth()
+        sh = window.winfo_screenheight()
+        x = (sw - w)/2
+        y = (sh - h)/2
+        window.geometry("%dx%d+%d+%d" % (w, h, x, y))
+
+
+    def load_game(self, saved_gamesListbox):
+        self.savemanager.load_game()
+
+
+    def save_load_window(self):
+        self.save_load_window = Toplevel(self.parent)
+        self.save_load_window.title("Save/load game")
+        self.centerWindow(self.save_load_window, 334, 126)
+        self.save_load_window.focus()
+
+        self.save_load_window.columnconfigure(1, minsize = 15)
+
+        self.save_gameEntry = ttk.Entry(self.save_load_window, width = 16, textvariable = self.savemanager.save_nameStringVar)
+
+        self.save_gameButton = ttk.Button(self.save_load_window, text = "Save game", width = 10, command = self.savemanager.save_game)
+        self.load_gameButton = ttk.Button(self.save_load_window, text = "Load game", command = self.savemanager.load_game)
+        self.delete_saveButton = ttk.Button(self.save_load_window, text = "Delete save", command = self.savemanager.delete_game)
+        self.confirmButton = ttk.Button(self.save_load_window, text = "Confirm", command = self.savemanager.confirm)
+        self.abortButton = ttk.Button(self.save_load_window, text = "Abort", command = self.savemanager.abort)
+
+        self.saved_gamesLabel = Label(self.save_load_window, text = "Saved games")
+        self.game_infoLabel = Label(self.save_load_window, text = "Game info")
+        self.save_statusLabel = Label(self.save_load_window, wraplength = 120, textvariable = self.save_statusStringVar)
+        self.saved_game_infoLabel = Label(self.save_load_window, width = 16, textvariable = self.savemanager.saved_game_infoStringVar)
+
+        self.saved_gamesListbox = Listbox(self.save_load_window, width = 16, height = 6, listvariable = self.savemanager.saved_gamesStringVar)
+        self.saved_gamesListbox.bind("<<ListboxSelect>>", self.savemanager.set_save_name_from_selection)
+        self.saved_gamesListbox.bind("<Double-1>", self.load_game)
+        self.saved_gamesScrollbar = ttk.Scrollbar(self.save_load_window, orient = VERTICAL, command = self.saved_gamesListbox.yview)
+        self.saved_gamesListbox.configure(yscrollcommand = self.saved_gamesScrollbar.set)
+
+        self.saved_gamesLabel.grid(row = 0, column = 0)
+        self.game_infoLabel.grid(row = 0, column = 2)
+        self.saved_gamesListbox.grid(row = 1, column = 0, rowspan = 6)
+        self.saved_game_infoLabel.grid(row = 1, column = 2, rowspan = 2, sticky = N)
+        self.save_gameEntry.grid(row = 4, column = 3, sticky = S)
+        self.save_gameButton.grid(row = 3, column = 3, sticky = N)
+        self.load_gameButton.grid(row = 1, column = 3, sticky = N)
+        self.delete_saveButton.grid(row = 2, column = 3, sticky = N)
+
+        self.savemanager.set_saved_games()
+
+
+    def get_selection_saved_game(self):
+        selection = self.saved_gamesListbox.curselection()
+        if selection:
+            selection_id = int(selection[0])
+            return self.savemanager.saved_games[selection_id]
+
+
+    def set_selection_saved_game(self, selection):
+        if len(self.savemanager.saved_games) > 0:
+            self.saved_gamesListbox.activate(selection)
+
+
+    def show_confirm_and_abortButton(self):
+        self.abortButton.grid(row = 4, column = 2)
+        self.confirmButton.grid(row = 3, column = 2)
+
+
+    def set_saved_gamesScrollbar_visibility(self):
+        if self.saved_gamesListbox.size() > self.saved_gamesListbox.cget("height"):
+            self.saved_gamesScrollbar.grid(row = 1, column = 1, rowspan = 4, sticky = (NW, S))
+        else:
+            self.saved_gamesScrollbar.grid_remove()
+
+
+    def set_save_statusStringVar(self, color, content):
+        self.save_statusLabel.grid(row = 3, column = 2, rowspan = 2)
+        self.save_statusLabel["foreground"] = color
+        self.save_statusStringVar.set(content)
+        self.parent.after(5000, lambda: self.save_statusLabel.grid_remove())
