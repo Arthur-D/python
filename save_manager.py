@@ -82,6 +82,10 @@ class SaveManager:
         else:
             self.guimanager.show_confirm_and_abortButton()
             self.set_confirm_function("save_game")
+        # print("selection_id in SaveManager: ", selection_id)
+        print("saved_gamesListbox.curselection in SaveManager.save_game:" , self.guimanager.saved_gamesListbox.curselection)
+        # self.guimanager.set_selection_saved_game(int(self.guimanager.saved_gamesListbox.curselection()[0]))
+        self.set_saved_game_infoStringVar()
 
 
     def load_game(self):
@@ -99,15 +103,21 @@ class SaveManager:
         if selection_id:
             self.guimanager.show_confirm_and_abortButton()
             self.set_confirm_function("delete_saved_game")
+            self.set_saved_game_infoStringVar()
         else:
             print("Select a save game!")
             self.gamelogic.set_game_statusStringVar("red", "Select a save game")
+        print("selection_id in SaveManager: ", selection_id)
 
 
     def set_saved_game_infoStringVar(self):
         saved_game_info = ""
         saveFile = shelve.open("Saves/{}".format(self.save_nameStringVar.get()))
         try:
+            if saveFile["GameLogic.playernameStringVar"] != "":
+                saved_game_info += "{}\n".format(saveFile["GameLogic.playernameStringVar"])
+            else:
+                saved_game_info += "No playername\n"
             saved_game_info += "{:%d.%m.%Y %H.%M}\n".format(saveFile["DateAndTime"])
             saved_game_info += "Turn: {}".format(saveFile["StateManager.turn_number"])
         except KeyError:
