@@ -174,6 +174,7 @@ class SaveManager:
                     print("Error code: ", error.code)
                 else:
                     print("Deleted file {}".format(save_name))
+            print("os.path.exists", os.path.exists("Saves/{}.bak".format(save_name)))
             if os.path.exists("Saves/{}.bak".format(save_name)):
                 try:
                     os.remove("Saves/{}.bak".format(save_name))
