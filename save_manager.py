@@ -58,10 +58,12 @@ class SaveManager:
 
 
     def confirm(self):
+        selection_id = self.saveandloadgui.get_selection_saved_game()
         print("self.confirm_function in SaveManager.confirm(): ", self.confirm_function)
         if self.confirm_function == "delete_saved_game":
             print("self.saveandloadgui.get_selection_saved_game() in SaveManager.confirm(): ", self.saveandloadgui.get_selection_saved_game())
-            self.delete_saved_game(self.saveandloadgui.get_selection_saved_game())
+            print("self.saved_games[selection_id] in SaveManager.confirm(): ", self.saved_games[selection_id])
+            self.delete_saved_game(self.saved_games[selection_id])
         elif self.confirm_function == "save_game":
             self.save_game_state(self.save_name)
         self.set_saved_game_infoStringVar()
@@ -75,7 +77,8 @@ class SaveManager:
 
 
     def set_save_name_from_selection(self, selection):
-        selection_id = self.saveandloadgui.get_selection_saved_game()
+        selection_id = self.saved_games[self.saveandloadgui.get_selection_saved_game()]
+        print("selection_id in SaveManager.set_save_name_from_selection(): ", selection_id)
         self.save_nameStringVar.set(selection_id)
         self.set_saved_game_infoStringVar()
 
@@ -106,7 +109,8 @@ class SaveManager:
 
     def delete_game(self):
         selection_id = self.saveandloadgui.get_selection_saved_game()
-        if selection_id:
+        print("selection_id in SaveManager.delete_game(): ", selection_id)
+        if selection_id != "":
             self.saveandloadgui.show_confirm_and_abortButton()
             self.set_confirm_function("delete_saved_game")
         else:
@@ -161,40 +165,40 @@ class SaveManager:
     def delete_saved_game(self, save_name):
         print("save_name in SaveManager.delete_saved_game(): ", save_name)
         if save_name in self.saved_games:
-            print("Deleting save '%s'" % save_name)
-            self.saved_games.remove(save_name)
-            if os.path.exists("Saves/%s" % save_name):
+            print("Deleting save '{}'".format(save_name))
+            if os.path.exists("Saves/{}".format(save_name)):
                 try:
-                    os.remove("Saves/%s" % save_name)
+                    os.remove("Saves/{}".format(save_name))
                 except OSError as error:
                     print("Failed with: ", error.strerror)
                     print("Error code: ", error.code)
                 else:
                     print("Deleted file {}".format(save_name))
-            if os.path.exists("Saves/%s.bak" % save_name):
+            if os.path.exists("Saves/{}.bak".format(save_name)):
                 try:
-                    os.remove("Saves/%s.bak" % save_name)
+                    os.remove("Saves/{}.bak".format(save_name))
                 except OSError as error:
                     print("Failed with: ", error.strerror)
                     print("Error code: ", error.code)
                 else:
                     print("Deleted file {}.bak".format(save_name))
-            if os.path.exists("Saves/%s.dat" % save_name):
+            if os.path.exists("Saves/{}.dat".format(save_name)):
                 try:
-                    os.remove("Saves/%s.dat" % save_name)
+                    os.remove("Saves/{}.dat".format(save_name))
                 except OSError as error:
                     print("Failed with: ", error.strerror)
                     print("Error code: ", error.code)
                 else:
                     print("Deleted file {}.dat".format(save_name))
-            if os.path.exists("Saves/%s.dir" % save_name):
+            if os.path.exists("Saves/{}.dir".format(save_name)):
                 try:
-                    os.remove("Saves/%s.dir" % save_name)
+                    os.remove("Saves/{}.dir".format(save_name))
                 except OSError as error:
                     print("Failed with: ", error.strerror)
                     print("Error code: ", error.code)
                 else:
                     print("Deleted file {}.dir".format(save_name))
+            self.saved_games.remove(save_name)
             self.saveandloadgui.set_save_statusStringVar("red", "Deleted save {}".format(save_name))
         else:
             print("Can't find save '%s' in saved games list; not deleting!" % save_name)
