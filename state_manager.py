@@ -13,8 +13,6 @@ class StateManager:
         self.robot_factory_amount = 0
         self.water_purifier_amount = 0
 
-        self.confirm_function = None
-
 
     def set_turn_number(self, turn_number):
         self.turn_number = turn_number
@@ -42,7 +40,3 @@ class StateManager:
 
     def set_water_purifier_amount(self, amount):
         self.water_purifier_amount = amount
-
-
-    def set_confirm_function(self, confirm_function):
-        self.confirm_function = confirm_function

@@ -1,4 +1,3 @@
-import time
 import threading
 from os import execl
 from sys import executable
@@ -91,7 +90,6 @@ class GameLogic():
         self.playernameStringVar = StringVar()
         self.error_playernameStringVar = StringVar()
         self.saved_playernameStringVar = StringVar()
-        self.save_nameStringVar = StringVar()
 
 
     def set_guimanager(self, guimanager):
@@ -170,54 +168,6 @@ class GameLogic():
             self.saved_playernameStringVar.set(self.saving_name)
             saved_nameLabel.grid()
             error_playernameLabel.grid_remove()
-
-
-    def save_game(self, saved_gamesCombobox):
-        self.save_name = str(self.save_nameStringVar.get())
-        if self.save_name not in self.savemanager.saved_games:
-            if self.save_name != "":
-                self.savemanager.save_game_state(self.save_name)
-                self.set_saved_games(saved_gamesCombobox)
-            else:
-                print("Error saving game: name empty!")
-                self.set_game_statusStringVar("red", "Save name empty")
-        else:
-            self.guimanager.show_confirm_and_abortButton()
-            self.statemanager.set_confirm_function("save_game")
-
-
-    def set_saved_games(self, saved_gamesCombobox):
-        self.savemanager.set_saved_games()
-        saved_gamesCombobox["values"] = self.savemanager.get_saved_games()
-
-
-    def select_saved_game(self, saved_gamesCombobox):
-        selection = saved_gamesCombobox.current()
-        if selection > -1:
-            self.save_nameStringVar.set(self.savemanager.saved_games[selection])
-        saved_gamesCombobox.select_clear()
-
-
-    def load_game(self, saved_gamesCombobox):
-        selection = saved_gamesCombobox.current()
-        if selection > -1:
-            save_game = self.savemanager.saved_games[selection]
-            print("Loading save '%s'" % save_game)
-            self.savemanager.load_game_state(save_game)
-        else:
-            print("Select a save game!")
-            self.set_game_statusStringVar("red", "Select a save game")
-
-
-    def delete_saved_game(self, saved_gamesCombobox):
-        selection = saved_gamesCombobox.current()
-        if selection > -1:
-            self.save_name = self.savemanager.saved_games[selection]
-            self.guimanager.show_confirm_and_abortButton()
-            self.statemanager.set_confirm_function("delete_saved_game")
-        else:
-            print("Select a save game!")
-            self.set_game_statusStringVar("red", "Select a save game")
 
 
 
