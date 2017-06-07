@@ -60,7 +60,6 @@ class SaveManager:
 
     def confirm(self):
         selection_id = self.saveandloadgui.get_selection_saved_game()
-        print("self.confirm_function in SaveManager.confirm(): ", self.confirm_function)
         if self.confirm_function == "delete_saved_game":
             self.delete_saved_game(self.saved_games[selection_id])
         elif self.confirm_function == "save_game":
@@ -108,7 +107,7 @@ class SaveManager:
 
     def delete_game(self):
         if self.saveandloadgui.get_selection_saved_game() != None:
-            selection_id = self.saveandloadgui.get_selection_saved_game()
+            # selection_id = self.saveandloadgui.get_selection_saved_game()
             self.saveandloadgui.show_confirm_and_abortButton()
             self.set_confirm_function("delete_saved_game")
         else:
@@ -119,7 +118,7 @@ class SaveManager:
     def set_saved_game_infoStringVar(self):
         saved_game_info = ""
         if self.saveandloadgui.get_selection_saved_game() != None:
-            saveFile = shelve.open("Saves/{}".format(self.save_nameStringVar.get()), flag = "r")
+            saveFile = shelve.open("Saves/{}".format(self.saved_games[self.saveandloadgui.get_selection_saved_game()], flag = "r"))
             try:
                 if saveFile["GameLogic.playernameStringVar"] != "":
                     saved_game_info += "{}\n".format(saveFile["GameLogic.playernameStringVar"])
@@ -171,6 +170,7 @@ class SaveManager:
                     print("Removal failed with: {}{}".format(save_name, extension), error.strerror)
                 else:
                     print("Deleted file {}{}".format(save_name, extension))
+        self.saveandloadgui.set_selection_saved_game(self.saved_games.index(save_name))
         self.saved_games.remove(save_name)
         self.saveandloadgui.set_save_statusStringVar("red", "Deleted save {}".format(save_name))
         self.set_saved_games()
