@@ -340,7 +340,6 @@ class SaveAndLoadGUI(Frame):
         selection = self.saved_gamesListbox.curselection()
         if selection:
             selection_id = int(selection[0])
-            print("selection_id in SaveAndLoadGUI.get_selection_saved_game(): ", selection_id)
             return selection_id
 
 

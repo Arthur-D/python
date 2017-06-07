@@ -62,8 +62,6 @@ class SaveManager:
         selection_id = self.saveandloadgui.get_selection_saved_game()
         print("self.confirm_function in SaveManager.confirm(): ", self.confirm_function)
         if self.confirm_function == "delete_saved_game":
-            print("self.saveandloadgui.get_selection_saved_game() in SaveManager.confirm(): ", self.saveandloadgui.get_selection_saved_game())
-            print("self.saved_games[selection_id] in SaveManager.confirm(): ", self.saved_games[selection_id])
             self.delete_saved_game(self.saved_games[selection_id])
         elif self.confirm_function == "save_game":
             self.save_game_state(self.save_name)
@@ -78,10 +76,10 @@ class SaveManager:
 
 
     def set_save_name_from_selection(self, selection):
-        selection_id = self.saved_games[self.saveandloadgui.get_selection_saved_game()]
-        print("selection_id in SaveManager.set_save_name_from_selection(): ", selection_id)
-        self.save_nameStringVar.set(selection_id)
-        self.set_saved_game_infoStringVar()
+        if self.saveandloadgui.get_selection_saved_game() != None:
+            selection_id = self.saved_games[self.saveandloadgui.get_selection_saved_game()]
+            self.save_nameStringVar.set(selection_id)
+            self.set_saved_game_infoStringVar()
 
 
     def save_game(self):
@@ -99,8 +97,8 @@ class SaveManager:
 
 
     def load_game(self):
-        selection_id = self.saveandloadgui.get_selection_saved_game()
-        if selection_id:
+        if self.saveandloadgui.get_selection_saved_game() != None:
+            selection_id = self.saved_games[self.saveandloadgui.get_selection_saved_game()]
             print("Loading save '{}'".format(selection_id))
             self.load_game_state(selection_id)
         else:
@@ -109,9 +107,8 @@ class SaveManager:
 
 
     def delete_game(self):
-        selection_id = self.saveandloadgui.get_selection_saved_game()
-        print("selection_id in SaveManager.delete_game(): ", selection_id)
-        if selection_id != "":
+        if self.saveandloadgui.get_selection_saved_game() != None:
+            selection_id = self.saveandloadgui.get_selection_saved_game()
             self.saveandloadgui.show_confirm_and_abortButton()
             self.set_confirm_function("delete_saved_game")
         else:
@@ -121,18 +118,19 @@ class SaveManager:
 
     def set_saved_game_infoStringVar(self):
         saved_game_info = ""
-        saveFile = shelve.open("Saves/{}".format(self.save_nameStringVar.get()), flag = "r")
-        try:
-            if saveFile["GameLogic.playernameStringVar"] != "":
-                saved_game_info += "{}\n".format(saveFile["GameLogic.playernameStringVar"])
-            else:
-                saved_game_info += "No playername\n"
-            saved_game_info += "{:%d.%m.%Y %H.%M}\n".format(saveFile["DateAndTime"])
-            saved_game_info += "Turn: {}".format(saveFile["StateManager.turn_number"])
-        except KeyError:
-            saved_game_info = "Could not load info"
-        finally:
-            saveFile.close()
+        if self.saveandloadgui.get_selection_saved_game() != None:
+            saveFile = shelve.open("Saves/{}".format(self.save_nameStringVar.get()), flag = "r")
+            try:
+                if saveFile["GameLogic.playernameStringVar"] != "":
+                    saved_game_info += "{}\n".format(saveFile["GameLogic.playernameStringVar"])
+                else:
+                    saved_game_info += "No playername\n"
+                saved_game_info += "{:%d.%m.%Y %H.%M}\n".format(saveFile["DateAndTime"])
+                saved_game_info += "Turn: {}".format(saveFile["StateManager.turn_number"])
+            except KeyError:
+                saved_game_info = "Could not load info"
+            finally:
+                saveFile.close()
         self.saved_game_infoStringVar.set(saved_game_info)
 
 
@@ -164,47 +162,17 @@ class SaveManager:
 
     # Function for deleting a save game. Only deletes files in the saved_games list with no file extension or with the Windows save game file extensions.
     def delete_saved_game(self, save_name):
-        print("save_name in SaveManager.delete_saved_game(): ", save_name)
-        if save_name in self.saved_games:
-            print("Deleting save '{}'".format(save_name))
-            if os.path.exists("Saves/{}".format(save_name)):
+        extensions = ["", ".bak", ".dat", ".dir"]
+        for extension in extensions:
+            if os.path.exists("Saves/{}{}".format(save_name, extension)):
                 try:
-                    os.remove("Saves/{}".format(save_name))
+                    os.remove("Saves/{}{}".format(save_name, extension))
                 except OSError as error:
-                    print("Failed with: ", error.strerror)
-                    print("Error code: ", error.code)
+                    print("Removal failed with: {}{}".format(save_name, extension), error.strerror)
                 else:
-                    print("Deleted file {}".format(save_name))
-            print("os.path.exists", os.path.exists("Saves/{}.bak".format(save_name)))
-            if os.path.exists("Saves/{}.bak".format(save_name)):
-                try:
-                    os.remove("Saves/{}.bak".format(save_name))
-                    # pdb.set_trace()
-                except OSError as error:
-                    print("Failed with: ", error.strerror)
-                    print("Error code: ", error.code)
-                else:
-                    print("Deleted file {}.bak".format(save_name))
-            if os.path.exists("Saves/{}.dat".format(save_name)):
-                try:
-                    os.remove("Saves/{}.dat".format(save_name))
-                except OSError as error:
-                    print("Failed with: ", error.strerror)
-                    print("Error code: ", error.code)
-                else:
-                    print("Deleted file {}.dat".format(save_name))
-            if os.path.exists("Saves/{}.dir".format(save_name)):
-                try:
-                    os.remove("Saves/{}.dir".format(save_name))
-                except OSError as error:
-                    print("Failed with: ", error.strerror)
-                    print("Error code: ", error.code)
-                else:
-                    print("Deleted file {}.dir".format(save_name))
-            self.saved_games.remove(save_name)
-            self.saveandloadgui.set_save_statusStringVar("red", "Deleted save {}".format(save_name))
-        else:
-            print("Can't find save '%s' in saved games list; not deleting!" % save_name)
+                    print("Deleted file {}{}".format(save_name, extension))
+        self.saved_games.remove(save_name)
+        self.saveandloadgui.set_save_statusStringVar("red", "Deleted save {}".format(save_name))
         self.set_saved_games()
 
 
