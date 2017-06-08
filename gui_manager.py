@@ -177,7 +177,7 @@ class GUI(Frame):
         self.menu_file = Menu(self.menubar)
         self.menubar.add_cascade(menu = self.menu_file, label = "File")
         self.menu_file.add_command(label = "New game", command = self.gamelogic.start_new_game)
-        self.menu_file.add_command(label = "Save current", command = self.savemanager.save_game)
+        self.menu_file.add_command(label = "Save current", command = self.savemanager.save_game_main_window)
         self.menu_file.add_command(label = "Load/Save as...", command = self.saveandloadgui.save_load_window)
 
         # Creating main buttons.
@@ -293,7 +293,7 @@ class SaveAndLoadGUI(Frame):
         print("window.bbox() in SaveAndLoadGUI.centerWindow(): ", window.bbox())
         x = (sw - w)/2
         y = (sh - h)/2
-        window.geometry("%dx%d+%d+%d" % (w, h, x, y))
+        # window.geometry("%dx%d+%d+%d" % (w, h, x, y))
         print("window.winfo_geometry() in SaveAndLoadGUI.centerWindow():" , window.winfo_geometry())
 
 
@@ -370,7 +370,8 @@ class SaveAndLoadGUI(Frame):
 
 
     def set_save_statusStringVar(self, color, content):
-        self.save_statusLabel.grid(row = 3, column = 2, rowspan = 2)
-        self.save_statusLabel["foreground"] = color
-        self.save_statusStringVar.set(content)
-        self.parent.after(5000, lambda: self.remove_save_statusLabel())
+        if self.save_load_window.state == "normal":
+            self.save_statusLabel.grid(row = 3, column = 2, rowspan = 2)
+            self.save_statusLabel["foreground"] = color
+            self.save_statusStringVar.set(content)
+            self.parent.after(5000, lambda: self.remove_save_statusLabel())

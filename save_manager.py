@@ -81,6 +81,18 @@ class SaveManager:
             self.set_saved_game_infoStringVar()
 
 
+    def save_game_main_window(self):
+        print("self.save_name in SaveManager.save_game_main_window(): ", self.save_name)
+        if self.save_name == "":
+            self.saveandloadgui.save_load_window()
+        elif self.save_name not in self.saved_games:
+            self.saveandloadgui.save_load_window()
+            print("self.save_name, self.saved_games in SaveManager.save_game_main_window(): ", self.save_name, self.saved_games)
+        else:
+            print("Saving ", self.save_name)
+            self.save_game_state(self.save_name)
+
+
     def save_game(self):
         self.save_name = str(self.save_nameStringVar.get())
         if self.save_name not in self.saved_games:
