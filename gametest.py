@@ -63,6 +63,7 @@ def main():
     buildingmanager.set_guimanager(app)
     gamelogic.set_guimanager(app)
     savemanager.set_guimanager(app)
+    saveandloadgui.set_guimanager(app)
     turnmanager.set_guimanager(app)
     queuemanager.set_guimanager(app)
     root.mainloop()
@@ -89,7 +90,6 @@ class ThreadObject (threading.Thread):
 # High level class getting the simulation started.
 class GameLogic():
     def __init__(self):
-        self.game_statusStringVar = StringVar()
         self.playernameStringVar = StringVar()
         self.error_playernameStringVar = StringVar()
         self.saved_playernameStringVar = StringVar()
@@ -149,13 +149,6 @@ class GameLogic():
             self.buildingmanager.building_errorStringVar.set("")
         else:
             print("Turn number is 100, game over")
-
-
-    def set_game_statusStringVar(self, color, content):
-        self.guimanager.game_statusLabel.grid()
-        self.guimanager.game_statusLabel["foreground"] = color
-        self.game_statusStringVar.set(content)
-        self.root.after(5000, lambda: self.guimanager.game_statusLabel.grid_remove())
 
 
     # Logic for saving playername to labels in GUI.

@@ -84,12 +84,11 @@ class SaveManager:
     def save_game_main_window(self):
         print("self.save_name in SaveManager.save_game_main_window(): ", self.save_name)
         if self.save_name == "":
-            self.saveandloadgui.save_load_window()
+            self.saveandloadgui.set_save_load_window()
         elif self.save_name not in self.saved_games:
-            self.saveandloadgui.save_load_window()
+            self.saveandloadgui.set_save_load_window()
             print("self.save_name, self.saved_games in SaveManager.save_game_main_window(): ", self.save_name, self.saved_games)
         else:
-            print("Saving ", self.save_name)
             self.save_game_state(self.save_name)
 
 
@@ -203,7 +202,11 @@ class SaveManager:
         saveFile["QueueManager.building_queue"] = self.queuemanager.building_queue
         saveFile["GameLogic.playernameStringVar"] = self.gamelogic.saved_playernameStringVar.get()
         saveFile.close()
-        self.saveandloadgui.set_save_statusStringVar("green", "Saved game {}".format(save_name))
+        print("Saved game as {}".format(save_name))
+        if self.saveandloadgui.save_load_window.winfo_exists() == 1:
+            self.saveandloadgui.set_save_statusStringVar("green", "Saved game {}".format(save_name))
+        else:
+            self.guimanager.set_game_statusStringVar("green", "Saved game {}".format(save_name))
 
 
     # Loads a game from the saved_games list and sets temporary variables. See set_game_state for setting the game's variables.
@@ -221,7 +224,9 @@ class SaveManager:
             self.saveandloadgui.set_save_statusStringVar("red", "Could not load save {}".format(save_name))
         else:
             self.set_game_state()
-            self.gamelogic.set_game_statusStringVar("green", "Loaded save\n{}".format(save_name))
+            self.guimanager.set_game_statusStringVar("green", "Loaded save\n{}".format(save_name))
+            if self.saveandloadgui.save_load_window.winfo_exists() == 1:
+                self.saveandloadgui.close_save_load_window()
         finally:
             saveFile.close()
 

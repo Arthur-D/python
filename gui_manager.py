@@ -26,6 +26,7 @@ class GUI(Frame):
         self.building_buildingStringVar = StringVar()
         self.building_building_turnsStringVar = StringVar()
         self.building_amountsStringVar = StringVar()
+        self.game_statusStringVar = StringVar()
 
         self.finished_buildings_amounts = {}
 
@@ -138,6 +139,13 @@ class GUI(Frame):
         self.building_amountsStringVar.set(building_amounts.rstrip("\n"))
 
 
+    def set_game_statusStringVar(self, color, content):
+        self.game_statusLabel.grid()
+        self.game_statusLabel["foreground"] = color
+        self.game_statusStringVar.set(content)
+        self.parent.after(5000, lambda: self.game_statusLabel.grid_remove())
+
+
     # Function with widget configuration. Currently unused.
     def set_UI_configuration(self):
         #time_leftMethod = time_left
@@ -178,7 +186,7 @@ class GUI(Frame):
         self.menubar.add_cascade(menu = self.menu_file, label = "File")
         self.menu_file.add_command(label = "New game", command = self.gamelogic.start_new_game)
         self.menu_file.add_command(label = "Save current", command = self.savemanager.save_game_main_window)
-        self.menu_file.add_command(label = "Load/Save as...", command = self.saveandloadgui.save_load_window)
+        self.menu_file.add_command(label = "Load/Save as...", command = self.saveandloadgui.set_save_load_window)
 
         # Creating main buttons.
         # self.resource_robotButton = ttk.Bu
@@ -195,7 +203,7 @@ class GUI(Frame):
         self.building_queueListbox.configure(yscrollcommand = self.building_queueScrollbar.set)
 
         # Creating labels.
-        self.game_statusLabel = ttk.Label(self, font = "TkTooltipFont", textvariable = self.gamelogic.game_statusStringVar)
+        self.game_statusLabel = ttk.Label(self, font = "TkTooltipFont", textvariable = self.game_statusStringVar)
         self.add_buildingsLabel = ttk.Label(self, text = "Add building")
         self.turnLabel = ttk.Label(self, textvariable = self.turnmanager.turn_numberStringVar)
         self.building_queueLabel = ttk.Label(self, text = "Building queue")
@@ -283,6 +291,10 @@ class SaveAndLoadGUI(Frame):
         self.save_statusStringVar = StringVar()
 
 
+    def set_guimanager(self, guimanager):
+        self.guimanager = guimanager
+
+
     # Creates the window in which the main frame and the rest is displayed. self.parent.geometry takes width, height, and then centers the window by checking for display resolution and then halving it to find the coordinates.
     def centerWindow(self, window):
         sw = window.winfo_screenwidth()
@@ -301,7 +313,7 @@ class SaveAndLoadGUI(Frame):
         self.savemanager.load_game()
 
 
-    def save_load_window(self):
+    def set_save_load_window(self):
         self.save_load_window = Toplevel(self.parent)
         self.save_load_window.title("Load/Save game")
         self.save_load_window.focus()
@@ -340,6 +352,10 @@ class SaveAndLoadGUI(Frame):
         self.centerWindow(self.save_load_window)
 
 
+    def close_save_load_window(self):
+        self.save_load_window.destroy()
+
+
     def get_selection_saved_game(self):
         selection = self.saved_gamesListbox.curselection()
         if selection:
@@ -365,12 +381,12 @@ class SaveAndLoadGUI(Frame):
 
 
     def remove_save_statusLabel(self):
-        if self.save_load_window.state == "normal":
+        if self.save_load_window.winfo_exists() == 1:
             self.save_statusLabel.grid_remove()
 
 
     def set_save_statusStringVar(self, color, content):
-        if self.save_load_window.state == "normal":
+        if self.save_load_window.winfo_exists() == 1:
             self.save_statusLabel.grid(row = 3, column = 2, rowspan = 2)
             self.save_statusLabel["foreground"] = color
             self.save_statusStringVar.set(content)
