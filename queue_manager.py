@@ -69,7 +69,6 @@ class QueueManager():
         else:
             print("No more buildings to remove. Building queue empty.")
         self.turnmanager.set_turns_left_building_queue()
-        self.buildingmanager.set_building_queue_turns()
         self.guimanager.set_building_queueScrollbar_visibility()
 
 
