@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from PIL import Image, ImageTk, ImageFilter
 
 
 
@@ -27,6 +28,7 @@ class GUI(Frame):
         self.building_building_turnsStringVar = StringVar()
         self.building_amountsStringVar = StringVar()
         self.game_statusStringVar = StringVar()
+        self.collection_itemsStringVar = StringVar()
 
         self.finished_buildings_amounts = {}
 
@@ -37,6 +39,9 @@ class GUI(Frame):
         self.building_queueListbox = Listbox(self, font = "TkFixedFont", width = 16, height = 5, background = "white", selectmode = "browse", listvariable = self.queuemanager.building_queueStringVar)
         self.building_queueListbox.configure(self.building_queueListbox.yview_scroll(1, "units"))
 
+        # Listing collection items.
+        self.collectionsListbox = Listbox(self, font = "TkFixedFont", width = 16, height = 5, listvariable = self.collection_itemsStringVar)
+
         # A name entry widget.
         self.nameentry = ttk.Entry(self, width = 16, textvariable = self.gamelogic.playernameStringVar)
 
@@ -46,15 +51,23 @@ class GUI(Frame):
         # Hidden label to display if an invalid name is entered in self.nameentry.
         self.error_playernameLabel = ttk.Label(self, foreground = "red", textvariable = self.gamelogic.error_playernameStringVar)
 
+        self.displayCanvas = Canvas(self, width = 960, height = 540, scrollregion = "0 0 1024 1024")
+        self.display_x_Scrollbar = Scrollbar(self, orient = HORIZONTAL, command = self.displayCanvas.xview)
+        self.display_y_Scrollbar = Scrollbar(self, orient = VERTICAL, command = self.displayCanvas.yview)
+        self.displayCanvas.configure(xscrollcommand = self.display_x_Scrollbar.set, yscrollcommand = self.display_y_Scrollbar.set)
+        self.displayCanvas.bind("<B1-Motion>", self.displayCanvas.xview)
+
         self.set_UI_configuration()
         self.set_UI_widgets()
         self.set_widgets_on_grid()
         self.set_widget_mouse_bindings()
+        self.fill_displayCanvas()
 
         self.queuemanager.set_finished_buildings()
         self.set_finished_buildings_amounts()
         self.turnmanager.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
         self.resourcemanager.energy_resourceStringVar.set("Energy: {}".format(self.statemanager.energy_resource))
+        # self.set_collectionsCombobox_selection()
 
 
     # Function for creating the window context.
@@ -62,7 +75,7 @@ class GUI(Frame):
         self.parent.title("Gametest")
         self._root().option_add("*tearOff", FALSE)
         self.pack(fill = BOTH, expand = True)
-        self.centerWindow(self.parent, 640, 480)
+        # self.centerWindow(self.parent, 960, 540)
 
 
     # Creates the window in which the main frame and the rest is displayed. self.parent.geometry takes width, height, and then centers the window by checking for display resolution and then halving it to find the coordinates.
@@ -99,6 +112,13 @@ class GUI(Frame):
             self.building_queueScrollbar.grid(row=4, column=0, sticky=(NE, S))
         else:
             self.building_queueScrollbar.grid_remove()
+
+
+    def set_collectionsScrollbar_visibility(self):
+        if self.collectionsListbox.size() > self.collectionsListbox.cget("height"):
+            self.collectionsScrollbar.grid(row=4, column=9, sticky=(NE, S))
+        else:
+            self.collectionsScrollbar.grid_remove()
 
 
     def get_buildingsListbox_selection(self):
@@ -146,35 +166,84 @@ class GUI(Frame):
         self.parent.after(5000, lambda: self.game_statusLabel.grid_remove())
 
 
+    def set_collectionsCombobox_selection(self, collectionsCombobox):
+        if self.collectionsCombobox.current() == 0:
+            self.queuemanager.set_buildings_collection()
+        elif self.collectionsCombobox.current() == 1:
+            self.queuemanager.set_robots_collection()
+        self.collectionsCombobox.selection_clear()
+
+
+    def fill_displayCanvas(self):
+        image_original_dirt = Image.open("Graphics/dirt_border.png")
+        image_resized_dirt = image_original_dirt.resize((128, 64))
+        # image_aa_dirt = image_resized_dirt.filter(ImageFilter.SMOOTH)
+        image_dirt = ImageTk.PhotoImage(image_resized_dirt)
+        self.displayCanvas.create_rectangle(2, 2, 1022, 1022)
+        self.image_dirt = image_dirt
+        x_loc = 388
+        y_loc = 4
+        offset_x = 64
+        offset_y = 32
+        for x in range(8):
+            x_loc += offset_x
+            y_loc += offset_y
+            self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
+        for x in range(7):
+            x_loc -= offset_x
+            y_loc += offset_y
+            self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
+
+        # for x in range(8):
+        #     x_loc += 64
+        #     y_loc += 32
+        #     self.displayCanvas.create_image(x_loc, y_loc, image = image_dirt)
+        # x_loc = 324
+        # y_loc = 36
+        # for x in range(8):
+        #     x_loc += 64
+        #     y_loc += 32
+        #     self.displayCanvas.create_image(x_loc, y_loc, image = image_dirt)
+        # x_loc = 260
+        # y_loc = 68
+        # for x in range(8):
+        #     x_loc += 64
+        #     y_loc += 32
+        #     self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
+        # x_loc = 196
+        # y_loc = 100
+        # for x in range(8):
+        #     x_loc += 64
+        #     y_loc += 32
+        #     self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
+        # x_loc = 132
+        # y_loc = 132
+        # for x in range(8):
+        #     x_loc += 64
+        #     y_loc += 32
+        #     self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
+        # x_loc = 68
+        # y_loc = 164
+        # for x in range(8):
+        #     x_loc += 64
+        #     y_loc += 32
+        #     self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
+        # x_loc = 4
+        # y_loc = 196
+        # for x in range(8):
+        #     x_loc += 64
+        #     y_loc += 32
+        #     self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
+
+
     # Function with widget configuration. Currently unused.
     def set_UI_configuration(self):
-        #time_leftMethod = time_left
-
         # Adding columns and padding space.
         column_number = 0
         # while column_number < 10:
         #     self.columnconfigure(column_number, pad = 4)
         #     print("column_number in GUI.UI_configuration: ", column_number)
         #     column_number += 1
-
-        # self.columnconfigure(0, pad = 2)
-        # self.columnconfigure(1, pad = 4)
-        # self.columnconfigure(2, pad = 4)
-        # self.columnconfigure(3, pad = 4)
-        # self.columnconfigure(4, pad = 4)
-        # self.columnconfigure(5, pad = 4)
-        # self.columnconfigure(6, pad = 4)
-        # self.columnconfigure(7, pad = 4)
-        # self.columnconfigure(8, pad = 0)
-        # self.columnconfigure(9, pad = 4)
-        # Adding rows and padding space.
-        # self.rowconfigure(0, pad = 3)
-        # self.rowconfigure(1, pad = 3)
-        # self.rowconfigure(2, pad = 20)
-        # self.rowconfigure(3, pad = 3)
-        # self.rowconfigure(4, pad = 3)
-        # self.rowconfigure(5, pad = 3)
-        # self.rowconfigure(6, pad = 3)
 
 
     # Creating UI elements and setting their parameters. Note: some widgets are in the constructor __init__().
@@ -201,6 +270,14 @@ class GUI(Frame):
         #Creating scrollbars.
         self.building_queueScrollbar = ttk.Scrollbar(self, orient = VERTICAL, command = self.building_queueListbox.yview)
         self.building_queueListbox.configure(yscrollcommand = self.building_queueScrollbar.set)
+        self.collectionsScrollbar = ttk.Scrollbar(self, orient = VERTICAL, command = self.collectionsListbox.yview)
+        self.collectionsListbox.configure(yscrollcommand = self.collectionsScrollbar.set)
+
+        # Creating comboboxes.
+        self.collectionsCombobox = ttk.Combobox(self)
+        self.collectionsCombobox["values"] = ("Buildings", "Robots")
+        self.collectionsCombobox["state"] = "readonly"
+        self.collectionsCombobox.current(1)
 
         # Creating labels.
         self.game_statusLabel = ttk.Label(self, font = "TkTooltipFont", textvariable = self.game_statusStringVar)
@@ -230,36 +307,42 @@ class GUI(Frame):
         self.resourcesLabelframe.grid(row = 0, column = 0, columnspan = 7, sticky = W)
         self.energy_resourceLabel.grid(row = 0, column = 1, sticky = W)
         self.game_statusLabel.grid(row = 0, column = 2)
-        self.saved_nameLabel.grid(row = 0, column = 8, sticky = W)
-        self.turnLabel.grid(row = 0, column = 8, sticky = E)
+        self.saved_nameLabel.grid(row = 0, column = 16, sticky = W)
+        self.turnLabel.grid(row = 0, column = 16, sticky = E)
 
         # Row 1:
         self.add_buildingsLabel.grid(row = 1, column = 0, sticky = S)
+        self.built_buildingLabel.grid(row = 1, column = 16, sticky = W)
 
         # Row 2:
         self.buildingsListbox.grid(row = 2, column = 0, sticky = W)
-        self.building_descriptionLabel.grid(row = 2, column = 2, sticky = NW)
-        self.buildingsLabelframe.grid(row = 2, column = 8, sticky = W)
+        self.display_y_Scrollbar.grid(row = 2, column = 15, rowspan = 4, sticky = NS)
+        self.building_descriptionLabel.grid(row = 1, column = 3, sticky = NW)
+        self.displayCanvas.grid(row = 2, column = 3, rowspan = 4, columnspan = 12)
+        self.buildingsLabelframe.grid(row = 2, column = 16, sticky = W)
 
         # Row 3:
         self.building_queueLabel.grid(row = 3, column = 0, sticky = S)
-        self.built_buildingLabel.grid(row = 3, column = 8, sticky = W)
+        self.collectionsCombobox.grid(row = 3, column = 16)
 
         # Row 4:
         self.building_queueListbox.grid(row = 4, column = 0, sticky = W)
+        self.collectionsListbox.grid(row = 4, column = 16, sticky = W)
 
         # Row 5:
         self.building_buildingLabel.grid(row = 5, column = 0, sticky = W)
+        self.display_x_Scrollbar.grid(row = 6, column = 3, columnspan = 13, sticky = EW)
 
         # Row 6:
         self.turns_left_building_queueLabel.grid(row = 6, column = 0, sticky = W)
 
         # Row 7:
-        self.building_amountsLabel.grid(row = 7, column = 8)
+        self.building_amountsLabel.grid(row = 7, column = 16)
+
         # Row 8:
 
         # Row 9:
-        self.nameentry.grid(row = 9, column = 2, sticky = W)
+        self.nameentry.grid(row = 9, column = 0, sticky = W)
         self.nameentry.focus()
         self.save_playernameButton.grid(row = 9, column = 3)
         self.end_turnButton.grid(row = 9, column = 6)
@@ -278,6 +361,7 @@ class GUI(Frame):
         self.buildingsListbox.bind("<Double-1>", self.add_buildings)
         self.building_queueListbox.bind("<Double-1>", self.remove_from_building_queue)
         self.building_queueListbox.bind("<3>", self.move_in_building_queue)
+        self.collectionsCombobox.bind("<<ComboboxSelected>>", self.set_collectionsCombobox_selection)
 
 
 

@@ -8,6 +8,7 @@ class Building():
         self.name = properties["Name"]
         self.turns = properties["Turn amount"]
         self.cost = properties["Cost"]
+        self.level = 1
 
 
     def get_name(self):
@@ -22,11 +23,22 @@ class Building():
         return self.cost
 
 
+    def get_level(self):
+        return self.level
+
+
     def decrease_turns(self):
         if self.turns > 0:
             self.turns -= 1
             if self.turns == 0:
                 print("Building complete: ", self.name)
+
+
+    def increase_level(self):
+        if self.level < 5:
+            self.level += 1
+            if self.level == 5:
+                print("Max level reached!")
 
 
 
@@ -161,7 +173,7 @@ class BuildingManager:
             self.guimanager.set_building_construction()
             self.guimanager.set_building_queueScrollbar_visibility()
         else:
-            self.gamelogic.set_game_statusStringVar("red", "Not enough\nresources to build!")
+            self.guimanager.set_game_statusStringVar("red", "Not enough\nresources to build!")
 
 
     # This defines what happens when finishing building something.
@@ -170,6 +182,8 @@ class BuildingManager:
         if self.previous_building:
             self.built_buildingStringVar.set("Built %s" % self.previous_building)
         self.queuemanager.set_finished_buildings()
+        self.guimanager.set_collectionsCombobox_selection()
+        self.guimanager.set_collectionsScrollbar_visibility()
         self.guimanager.set_finished_buildings_amounts()
         self.queuemanager.remove_from_building_queue()
         self.guimanager.set_building_construction()

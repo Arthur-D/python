@@ -1,5 +1,6 @@
 from tkinter import StringVar
 from building_manager import Building
+from robot_manager import Robot
 
 
 
@@ -9,6 +10,7 @@ class QueueManager():
         self.building_queue = []
         self.building_queueStringVar = StringVar()
         self.finished_buildings = []
+        self.finished_robots = []
 
 
     def set_buildingmanager(self, buildingmanager):
@@ -21,6 +23,10 @@ class QueueManager():
 
     def set_resourcemanager(self, resourcemanager):
         self.resourcemanager = resourcemanager
+
+
+    def set_robotmanager(self, robotmanager):
+        self.robotmanager = robotmanager
 
 
     def set_turnmanager(self, turnmanager):
@@ -111,3 +117,22 @@ class QueueManager():
     def set_finished_buildings(self):
         if self.get_currently_building_index() != None:
             self.finished_buildings.append(self.building_queue[self.get_currently_building_index()])
+
+
+    def set_buildings_collection(self):
+        buildings = ""
+        if len(self.finished_buildings) > 0:
+            for building in self.finished_buildings:
+                buildings += "{{{:15}{}}}\n".format(building.get_name(), building.get_level())
+            self.guimanager.collection_itemsStringVar.set(buildings)
+
+
+    def set_finished_robots(self):
+        self.finished_robots.append()
+
+
+    def set_robots_collection(self):
+        robots = ""
+        for robot in self.finished_robots:
+            robots += "{{{:15}{}}}\n".format(robot.get_name(), robot.get_level())
+        self.guimanager.collection_itemsStringVar.set(robots)

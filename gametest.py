@@ -9,6 +9,7 @@ from tkinter import ttk
 from turn_manager import *
 from building_manager import *
 from resource_manager import *
+from robot_manager import *
 from save_manager import *
 from state_manager import *
 
@@ -23,6 +24,7 @@ def main():
     turnmanager = TurnManager()
     buildingmanager = BuildingManager()
     resourcemanager = ResourceManager()
+    # robotmanager = RobotManager()
     savemanager = SaveManager()
     saveandloadgui = SaveAndLoadGUI(root, savemanager)
 
@@ -36,6 +38,7 @@ def main():
 
     queuemanager.set_buildingmanager(buildingmanager)
     queuemanager.set_resourcemanager(resourcemanager)
+    # queuemanager.set_robotmanager(robotmanager)
     queuemanager.set_turnmanager(turnmanager)
 
     turnmanager.set_buildingmanager(buildingmanager)
@@ -142,9 +145,6 @@ class GameLogic():
             self.resourcemanager.increase_energy_resource()
             self.turnmanager.decrease_building_turns()
             self.queuemanager.set_building_queue_names()
-            if self.guimanager.confirmButton.winfo_viewable():
-                print("Aborting action needing confirmation")
-                self.guimanager.abort()
             self.guimanager.building_queueListbox.see(len(self.queuemanager.building_queue) - 1)
             self.buildingmanager.building_errorStringVar.set("")
         else:
