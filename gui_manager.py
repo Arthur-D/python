@@ -51,11 +51,11 @@ class GUI(Frame):
         # Hidden label to display if an invalid name is entered in self.nameentry.
         self.error_playernameLabel = ttk.Label(self, foreground = "red", textvariable = self.gamelogic.error_playernameStringVar)
 
-        self.displayCanvas = Canvas(self, width = 640, height = 360, scrollregion = "0 0 1024 1024")
+        self.displayCanvas = Canvas(self, width = 640, height = 360, scrollregion = "0 0 1280 720")
         self.display_x_Scrollbar = Scrollbar(self, orient = HORIZONTAL, command = self.displayCanvas.xview)
         self.display_y_Scrollbar = Scrollbar(self, orient = VERTICAL, command = self.displayCanvas.yview)
         self.displayCanvas.configure(xscrollcommand = self.display_x_Scrollbar.set, yscrollcommand = self.display_y_Scrollbar.set)
-        self.displayCanvas.bind("<B1-Motion>", self.displayCanvas.xview)
+        # self.displayCanvas.bind("<B1-Motion>", self.displayCanvas.xview_scroll(1, "units"))
 
         self.set_UI_configuration()
         self.set_UI_widgets()
@@ -174,66 +174,53 @@ class GUI(Frame):
         self.collectionsCombobox.selection_clear()
 
 
+    def set_tile_properties(self):
+        self.tile_properties = [
+            {"Name" : "Dirt", "Loc_X" : ""}
+        ]
+
+
     def fill_displayCanvas(self):
         image_original_dirt = Image.open("Graphics/dirt_border.png")
         image_resized_dirt = image_original_dirt.resize((128, 64))
-        # image_aa_dirt = image_resized_dirt.filter(ImageFilter.SMOOTH)
         image_dirt = ImageTk.PhotoImage(image_resized_dirt)
-        self.displayCanvas.create_rectangle(2, 2, 1022, 1022)
+        size_x = 1278
+        size_y = 718
+        self.displayCanvas.create_rectangle(2, 2, size_x, size_y)
         self.image_dirt = image_dirt
-        x_loc = 388
-        y_loc = 4
+        x_loc_x = size_x / 2
+        x_loc_y = 4
         offset_x = 64
         offset_y = 32
-        for x in range(8):
-            x_loc += offset_x
-            y_loc += offset_y
-            self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
-        for x in range(7):
-            x_loc -= offset_x
-            y_loc += offset_y
-            self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
-
-        # for x in range(8):
-        #     x_loc += 64
-        #     y_loc += 32
-        #     self.displayCanvas.create_image(x_loc, y_loc, image = image_dirt)
-        # x_loc = 324
-        # y_loc = 36
-        # for x in range(8):
-        #     x_loc += 64
-        #     y_loc += 32
-        #     self.displayCanvas.create_image(x_loc, y_loc, image = image_dirt)
-        # x_loc = 260
-        # y_loc = 68
-        # for x in range(8):
-        #     x_loc += 64
-        #     y_loc += 32
-        #     self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
-        # x_loc = 196
-        # y_loc = 100
-        # for x in range(8):
-        #     x_loc += 64
-        #     y_loc += 32
-        #     self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
-        # x_loc = 132
-        # y_loc = 132
-        # for x in range(8):
-        #     x_loc += 64
-        #     y_loc += 32
-        #     self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
-        # x_loc = 68
-        # y_loc = 164
-        # for x in range(8):
-        #     x_loc += 64
-        #     y_loc += 32
-        #     self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
-        # x_loc = 4
-        # y_loc = 196
-        # for x in range(8):
-        #     x_loc += 64
-        #     y_loc += 32
-        #     self.displayCanvas.create_image(x_loc, y_loc, image=image_dirt)
+        tile_number = 10
+        tile_x_id_x = -1
+        tiles_x = 0
+        tiles_y = 0
+        tile_id = 0
+        self.tiles = []
+        for x in range(tile_number):
+            x_loc_x += offset_x
+            x_loc_y += offset_y
+            y_loc_x = x_loc_x
+            y_loc_y = x_loc_y
+            tile_x_id_x += 1
+            tile_y_id_x = tile_x_id_x
+            tile_y_id_y = 0
+            tiles_x += 1
+            for y in range(tile_number):
+                y_loc_x -= offset_x
+                y_loc_y += offset_y
+                tile_dirt = Tile(tile_id, y_loc_x, y_loc_y, "dirt", None)
+                self.tiles.append(tile_dirt)
+                self.displayCanvas.create_image(tile_dirt.get_loc_x(), tile_dirt.get_loc_y(), image = image_dirt)
+                self.displayCanvas.create_text(y_loc_x, y_loc_y, text="{} {}".format(tiles_y, tile_dirt.get_name()), font="TkFixedFont 16")
+                tile_y_id_x -= 1
+                tile_y_id_y += 1
+                tiles_y += 1
+                tile_id += 1
+        for tile in self.tiles:
+            print("tile.get_id(), tile.get_name() in GUI.fill_displayCanvas(): ", tile.get_id(), tile.get_name())
+        print("tiles_x, tiles_y in GUI.fill_displayCanvas(): ", tiles_x, tiles_y)
 
 
     # Function with widget configuration. Currently unused.
@@ -475,3 +462,31 @@ class SaveAndLoadGUI(Frame):
             self.save_statusLabel["foreground"] = color
             self.save_statusStringVar.set(content)
             self.parent.after(5000, lambda: self.remove_save_statusLabel())
+
+
+
+class Tile:
+    def __init__(self, id, loc_x, loc_y, name, overlay):
+        self.id = id
+        self.loc_x = loc_x
+        self.loc_y = loc_y
+        self.name = name
+        self.overlay = overlay
+
+    def get_id(self):
+        return self.id
+
+    def get_name(self):
+        return self.name
+
+    def get_loc(self):
+        return self.loc_x, self.loc_y
+
+    def get_loc_x(self):
+        return self.loc_x
+
+    def get_loc_y(self):
+        return self.loc_y
+
+    def get_overlay(self):
+        return overlay
