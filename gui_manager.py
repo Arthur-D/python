@@ -1,3 +1,4 @@
+# import tkinter
 from tkinter import *
 from tkinter import ttk
 from PIL import Image, ImageTk, ImageFilter
@@ -8,7 +9,7 @@ from PIL import Image, ImageTk, ImageFilter
 class GUI(Frame):
     def __init__(self, parent, gamelogic, buildingmanager, queuemanager, turnmanager, resourcemanager, savemanager, statemanager, saveandloadgui):
         # Creates the main frame and background color.
-        Frame.__init__(self, parent, background = "#d9d9d9")
+        Frame.__init__(self, parent, background = "light grey")
         self.parent = parent
         self.style = ttk.Style()
         self.style.theme_use("default")
@@ -51,7 +52,7 @@ class GUI(Frame):
         # Hidden label to display if an invalid name is entered in self.nameentry.
         self.error_playernameLabel = ttk.Label(self, foreground = "red", textvariable = self.gamelogic.error_playernameStringVar)
 
-        self.displayCanvas = Canvas(self, width = 640, height = 360, scrollregion = "0 0 1280 720")
+        self.displayCanvas = ResizingCanvas(self, width = 640, height = 360, scrollregion = "0 0 1280 720", highlightthickness = 0)
         self.display_x_Scrollbar = Scrollbar(self, orient = HORIZONTAL, command = self.displayCanvas.xview)
         self.display_y_Scrollbar = Scrollbar(self, orient = VERTICAL, command = self.displayCanvas.yview)
         self.displayCanvas.configure(xscrollcommand = self.display_x_Scrollbar.set, yscrollcommand = self.display_y_Scrollbar.set)
@@ -74,7 +75,8 @@ class GUI(Frame):
     def initUI(self):
         self.parent.title("Gametest")
         self._root().option_add("*tearOff", FALSE)
-        self.pack(fill = BOTH, expand = True)
+        # self.pack(fill = BOTH, expand = True)
+        self.grid()
         # self.centerWindow(self.parent, 960, 540)
 
 
@@ -181,56 +183,76 @@ class GUI(Frame):
 
 
     def fill_displayCanvas(self):
-        image_original_dirt = Image.open("Graphics/dirt_border.png")
-        image_resized_dirt = image_original_dirt.resize((128, 64))
-        image_dirt = ImageTk.PhotoImage(image_resized_dirt)
         size_x = 1278
         size_y = 718
-        self.displayCanvas.create_rectangle(2, 2, size_x, size_y)
-        self.image_dirt = image_dirt
+        # self.displayCanvas.create_rectangle(2, 2, size_x, size_y)
         x_loc_x = size_x / 2
         x_loc_y = 4
         offset_x = 64
         offset_y = 32
-        tile_number = 10
+        num_tiles = 10
         tile_x_id_x = -1
         tiles_x = 0
         tiles_y = 0
         tile_id = 0
         self.tiles = []
-        for x in range(tile_number):
+        self.concrete = [44, 45, 54, 55]
+        for x in range(num_tiles):
             x_loc_x += offset_x
             x_loc_y += offset_y
             y_loc_x = x_loc_x
             y_loc_y = x_loc_y
             tile_x_id_x += 1
-            tile_y_id_x = tile_x_id_x
-            tile_y_id_y = 0
+            # tile_y_id_x = tile_x_id_x
+            # tile_y_id_y = 0
             tiles_x += 1
-            for y in range(tile_number):
+            for y in range(num_tiles):
                 y_loc_x -= offset_x
                 y_loc_y += offset_y
-                tile_dirt = Tile(tile_id, y_loc_x, y_loc_y, "dirt", None)
-                self.tiles.append(tile_dirt)
-                self.displayCanvas.create_image(tile_dirt.get_loc_x(), tile_dirt.get_loc_y(), image = image_dirt)
-                self.displayCanvas.create_text(y_loc_x, y_loc_y, text="{} {}".format(tiles_y, tile_dirt.get_name()), font="TkFixedFont 16")
-                tile_y_id_x -= 1
-                tile_y_id_y += 1
+                if tile_id in self.concrete:
+                    tile_concrete = Tile(tile_id, y_loc_x, y_loc_y, "concrete", "concrete_border.png", None)
+                    self.tiles.append(tile_concrete)
+                    self.displayCanvas.create_image(tile_concrete.get_loc_x(), tile_concrete.get_loc_y(), image = tile_concrete.get_image())
+                    # self.displayCanvas.create_text(y_loc_x, y_loc_y, text="{} {}".format(tile_concrete.get_id(), tile_concrete.get_name()),
+                    #                            font="TkFixedFont 16")
+                if tile_id not in self.concrete:
+                    tile_dirt = Tile(tile_id, y_loc_x, y_loc_y, "dirt", "dirt_border.png", None)
+                    self.tiles.append(tile_dirt)
+                    self.displayCanvas.create_image(tile_dirt.get_loc_x(), tile_dirt.get_loc_y(), image = tile_dirt.get_image())
+                    # self.displayCanvas.create_text(y_loc_x, y_loc_y, text="{} {}".format(tile_dirt.get_id(), tile_dirt.get_name()), font="TkFixedFont 16")
+                # tile_y_id_x -= 1
+                # tile_y_id_y += 1
                 tiles_y += 1
                 tile_id += 1
-        for tile in self.tiles:
-            print("tile.get_id(), tile.get_name() in GUI.fill_displayCanvas(): ", tile.get_id(), tile.get_name())
+        # for tile in self.tiles:
+            # print("tile.get_id(), tile.get_name() in GUI.fill_displayCanvas(): ", tile.get_id(), tile.get_name())
         print("tiles_x, tiles_y in GUI.fill_displayCanvas(): ", tiles_x, tiles_y)
+        for tile in self.tiles:
+            if tile.get_id() == 44:
+                building = "orange_hq01_cropped.png"
+                building_original = Image.open("Graphics/{}".format(building))
+                building_resized = building_original.resize((123, 121))
+                # building_rotated = building_resized.rotate(2, expand = True)
+                building_final = ImageTk.PhotoImage(building_resized)
+                self.building_final = building_final
+                self.displayCanvas.create_image(tile.get_loc_x() - 2, tile.get_loc_y() + 3,
+                                        image = building_final, anchor = "center")
 
 
-    # Function with widget configuration. Currently unused.
+    # Function with widget configuration.
     def set_UI_configuration(self):
         # Adding columns and padding space.
+        row_number = 0
         column_number = 0
-        # while column_number < 10:
-        #     self.columnconfigure(column_number, pad = 4)
-        #     print("column_number in GUI.UI_configuration: ", column_number)
-        #     column_number += 1
+        while row_number < 11:
+            self.grid_rowconfigure(row_number, weight = 1)
+            print("row_number in GUI.UI_configuration: ", row_number)
+            row_number += 1
+        while column_number < 17:
+            self.grid_columnconfigure(column_number, weight = 1)
+            print("column_number in GUI.UI_configuration: ", column_number)
+            column_number += 1
+        print(self.grid_rowconfigure(10))
 
 
     # Creating UI elements and setting their parameters. Note: some widgets are in the constructor __init__().
@@ -288,8 +310,6 @@ class GUI(Frame):
 
     # Placement of UI elements on the grid.
     def set_widgets_on_grid(self):
-        self.grid(sticky = N + S + W + E)
-
         # Row 0:
         self.resourcesLabelframe.grid(row = 0, column = 0, columnspan = 7, sticky = W)
         self.energy_resourceLabel.grid(row = 0, column = 1, sticky = W)
@@ -305,7 +325,7 @@ class GUI(Frame):
         self.buildingsListbox.grid(row = 2, column = 0, sticky = W)
         self.display_y_Scrollbar.grid(row = 2, column = 15, rowspan = 4, sticky = NS)
         self.building_descriptionLabel.grid(row = 1, column = 3, sticky = NW)
-        self.displayCanvas.grid(row = 2, column = 3, rowspan = 4, columnspan = 12)
+        self.displayCanvas.grid(row = 2, column = 3, rowspan = 4, columnspan = 12, sticky = NSEW, )
         self.buildingsLabelframe.grid(row = 2, column = 16, sticky = W)
 
         # Row 3:
@@ -466,18 +486,26 @@ class SaveAndLoadGUI(Frame):
 
 
 class Tile:
-    def __init__(self, id, loc_x, loc_y, name, overlay):
+    def __init__(self, id, loc_x, loc_y, name, filename, overlay):
         self.id = id
         self.loc_x = loc_x
         self.loc_y = loc_y
         self.name = name
+        self.filename = filename
         self.overlay = overlay
+
+        self.set_image()
+        self.set_overlay()
+
 
     def get_id(self):
         return self.id
 
     def get_name(self):
         return self.name
+
+    def get_filename(self):
+        return self.filename
 
     def get_loc(self):
         return self.loc_x, self.loc_y
@@ -489,4 +517,45 @@ class Tile:
         return self.loc_y
 
     def get_overlay(self):
-        return overlay
+        return self.overlay_final
+
+    def get_image(self):
+        return self.image_final
+
+
+    def set_image(self):
+        image_original = Image.open("Graphics/{}".format(self.filename))
+        image_resized = image_original.resize((128, 64))
+        image_final = ImageTk.PhotoImage(image_resized)
+        self.image_final = image_final
+
+
+    def set_overlay(self):
+        if self.overlay != None:
+            overlay_original = Image.open("Graphics/{}".format(self.overlay))
+            overlay_resized = overlay_original.resize((128, 64))
+            overlay_final = ImageTk.PhotoImage(overlay_resized)
+            self.overlay_final = overlay_final
+
+
+
+
+# a subclass of Canvas for dealing with resizing of windows
+class ResizingCanvas(Canvas):
+    def __init__(self,parent,**kwargs):
+        Canvas.__init__(self,parent,**kwargs)
+        self.bind("<Configure>", self.on_resize)
+        self.height = self.winfo_reqheight()
+        self.width = self.winfo_reqwidth()
+
+
+    def on_resize(self,event):
+        # determine the ratio of old width/height to new width/height
+        wscale = float(event.width)/self.width
+        hscale = float(event.height)/self.height
+        self.width = event.width
+        self.height = event.height
+        # resize the canvas
+        self.config(width=self.width, height=self.height)
+        # rescale all the objects tagged with the "all" tag
+        self.scale("all",0,0,wscale,hscale)
