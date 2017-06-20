@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw
 
 
 
@@ -51,20 +51,13 @@ class GUI(Frame):
         # Hidden label to display if an invalid name is entered in self.nameentry.
         self.error_playernameLabel = ttk.Label(self, foreground = "red", textvariable = self.gamelogic.error_playernameStringVar)
 
-        self.displayCanvas = Canvas(self, width = 640, height = 360, scrollregion = "0 0 1280 720")
-
-        self.display_x_Scrollbar = Scrollbar(self, orient = HORIZONTAL, command = self.displayCanvas.xview)
-        self.display_y_Scrollbar = Scrollbar(self, orient = VERTICAL, command = self.displayCanvas.yview)
-        self.displayCanvas.configure(xscrollcommand = self.display_x_Scrollbar.set, yscrollcommand = self.display_y_Scrollbar.set)
-        # self.displayCanvas.bind("<B1-Motion>", self.displayCanvas.xview_scroll(1, "units"))
-
         self.set_UI_configuration()
         self.set_UI_widgets()
         self.set_widgets_on_grid()
         self.set_widget_mouse_bindings()
         self.fill_displayCanvas()
 
-        self.queuemanager.set_finished_buildings()
+        self.buildingmanager.set_finished_buildings()
         self.set_finished_buildings_amounts()
         self.turnmanager.turn_numberStringVar.set("Turn %s" % self.statemanager.turn_number)
         self.resourcemanager.energy_resourceStringVar.set("Energy: {}".format(self.statemanager.energy_resource))
@@ -76,13 +69,19 @@ class GUI(Frame):
         self.parent.title("Gametest")
         self._root().option_add("*tearOff", FALSE)
         self.pack(fill = BOTH, expand = True)
-        # self.centerWindow(self.parent, 960, 540)
+        self.centerWindow(self.parent)
 
 
     # Creates the window in which the main frame and the rest is displayed. self.parent.geometry takes width, height, and then centers the window by checking for display resolution and then halving it to find the coordinates.
-    def centerWindow(self, window, w, h):
+    def centerWindow(self, window):
         sw = window.winfo_screenwidth()
         sh = window.winfo_screenheight()
+        if sw <= 1280 or sh <= 720:
+            w = 960
+            h = 540
+        else:
+            w = 1280
+            h = 720
         x = (sw - w)/2
         y = (sh - h)/2
         window.geometry("%dx%d+%d+%d" % (w, h, x, y))
@@ -150,7 +149,7 @@ class GUI(Frame):
 
     def set_finished_buildings_amounts(self):
         building_amounts = ""
-        building_names = [building.get_name() for building in self.queuemanager.finished_buildings]
+        building_names = [building.get_name() for building in self.buildingmanager.finished_buildings]
         for building_name in self.buildingmanager.buildings_names_list:
             self.finished_buildings_amounts[building_name] = building_names.count(building_name)
             if building_name.endswith("y"):
@@ -193,9 +192,9 @@ class GUI(Frame):
         tile_x_id_x = -1
         tiles_x = 0
         tiles_y = 0
-        tile_id = 0
+        tile_id = 1
         self.tiles = []
-        self.concrete = [44, 45, 54, 55]
+        self.concrete = [45, 46, 55, 56]
         for x in range(num_tiles):
             x_loc_x += offset_x
             x_loc_y += offset_y
@@ -209,41 +208,56 @@ class GUI(Frame):
                 y_loc_x -= offset_x
                 y_loc_y += offset_y
                 if tile_id in self.concrete:
-                    tile_concrete = Tile(tile_id, y_loc_x, y_loc_y, "concrete", "concrete_border.png", None)
+                    tile_concrete = Tile(tile_id, y_loc_x, y_loc_y, "concrete", "concrete_border.png", "overlay.png")
                     self.tiles.append(tile_concrete)
-                    self.displayCanvas.create_image(tile_concrete.get_loc_x(), tile_concrete.get_loc_y(), image = tile_concrete.get_image())
+                    self.displayCanvas.create_image(tile_concrete.get_loc_x(), tile_concrete.get_loc_y(), image = tile_concrete.get_image(), activeimage = tile_concrete.get_overlay())
                     # self.displayCanvas.create_text(y_loc_x, y_loc_y, text="{} {}".format(tile_concrete.get_id(), tile_concrete.get_name()),
                     #                            font="TkFixedFont 16")
                 if tile_id not in self.concrete:
                     tile_dirt = Tile(tile_id, y_loc_x, y_loc_y, "dirt", "dirt_border.png", "overlay.png")
                     self.tiles.append(tile_dirt)
-                    self.displayCanvas.create_image(tile_dirt.get_loc_x(), tile_dirt.get_loc_y(), image = tile_dirt.get_image())
+                    self.displayCanvas.create_image(tile_dirt.get_loc_x(), tile_dirt.get_loc_y(), image = tile_dirt.get_image(), activeimage = tile_dirt.get_overlay())
+                    self.displayCanvas.tag_bind(tile_id, "<1>", self.select_displayCanvas_item)
                     # self.displayCanvas.create_text(y_loc_x, y_loc_y, text="{} {}".format(tile_dirt.get_id(), tile_dirt.get_name()), font="TkFixedFont 16")
                 # tile_y_id_x -= 1
                 # tile_y_id_y += 1
                 tiles_y += 1
                 tile_id += 1
-        # for tile in self.tiles:
+                # for tile in self.tiles:
             # print("tile.get_id(), tile.get_name() in GUI.fill_displayCanvas(): ", tile.get_id(), tile.get_name())
         print("tiles_x, tiles_y in GUI.fill_displayCanvas(): ", tiles_x, tiles_y)
         for tile in self.tiles:
-            if tile.get_id() == 44:
+            if tile.get_id() == 45:
                 building = "orange_hq01_cropped.png"
                 building_original = Image.open("Graphics/{}".format(building))
                 building_resized = building_original.resize((123, 121))
                 # building_rotated = building_resized.rotate(2, expand = True)
                 building_final = ImageTk.PhotoImage(building_resized)
+                building_overlay_file = "orange_hq01_overlay.png"
+                building_overlay = Image.open("Graphics/{}".format(building_overlay_file))
+                building_overlay_resized = building_overlay.resize((123, 121))
+                building_overlay_final = ImageTk.PhotoImage(building_overlay_resized)
+                self.building_overlay_final = building_overlay_final
                 self.building_final = building_final
-                self.displayCanvas.create_image(tile.get_loc_x() - 2, tile.get_loc_y() + 3,
-                                        image = building_final, anchor = "center")
-        self.displayCanvas.addtag_all("canvas_item")
-        self.displayCanvas.itemconfigure("canvas_item", activeimage = tile_dirt.get_overlay())
-        self.displayCanvas.bind_all("<Button-1>", self.select_tile)
+                self.displayCanvas.create_image(tile.get_loc_x() - 2, tile.get_loc_y() + 3, image = building_final, activeimage = building_overlay_final, anchor = "center", tag = "building")
+        self.displayCanvas.tag_bind("building", "<1>", self.select_displayCanvas_item)
 
 
-    def select_tile(self, displayCanvas):
-        # self.displayCanvas.itemconfigure("canvas_item", foreground = "red")
-        pass
+    def select_displayCanvas_item(self, displayCanvas):
+        selection = self.displayCanvas.find_withtag("current")
+        selection_id = int(selection[0])
+        print("selection_id in GUI.select_displayCanvas_item(): ", selection_id)
+        # print("self.displayCanvas.find_withtag('building') in GUI.select_displayCanvas_item(): ", self.displayCanvas.find_withtag("building"))
+        if selection_id == 101:
+            print("self.buildingmanager.finished_buildings[0].get_name()) in GUI.select_displayCanvas_item(): ", self.buildingmanager.finished_buildings[0].get_name())
+
+
+    def scroll_displayCanvas_start(self, displayCanvas):
+        self.displayCanvas.scan_mark(displayCanvas.x, displayCanvas.y)
+
+
+    def scroll_displayCanvas_end(self, displayCanvas):
+        self.displayCanvas.scan_dragto(displayCanvas.x, displayCanvas.y, 1)
 
 
     # Function with widget configuration.
@@ -269,6 +283,15 @@ class GUI(Frame):
         self.menu_file.add_command(label = "New game", command = self.gamelogic.start_new_game)
         self.menu_file.add_command(label = "Save current", command = self.savemanager.save_game_main_window)
         self.menu_file.add_command(label = "Load/Save as...", command = self.saveandloadgui.set_save_load_window)
+
+        self.displayCanvas = Canvas(self, scrollregion = "0 0 1280 720")
+        # self.displayCanvas.configure(width = 640, height = 360)
+
+        self.display_x_Scrollbar = Scrollbar(self, orient = HORIZONTAL, command = self.displayCanvas.xview)
+        self.display_y_Scrollbar = Scrollbar(self, orient = VERTICAL, command = self.displayCanvas.yview)
+        self.displayCanvas.configure(xscrollcommand = self.display_x_Scrollbar.set, yscrollcommand = self.display_y_Scrollbar.set)
+        self.displayCanvas.bind("<Button-3>", self.scroll_displayCanvas_start)
+        self.displayCanvas.bind("<B3-Motion>", self.scroll_displayCanvas_end)
 
         # Creating main buttons.
         # self.resource_robotButton = ttk.Bu
@@ -327,9 +350,9 @@ class GUI(Frame):
 
         # Row 2:
         self.buildingsListbox.grid(row = 2, column = 0, sticky = W)
-        self.display_y_Scrollbar.grid(row = 2, column = 15, rowspan = 4, sticky = NS)
+        self.display_y_Scrollbar.grid(row = 0, column = 15, rowspan = 8, sticky = NS + W)
         self.building_descriptionLabel.grid(row = 1, column = 3, sticky = NW)
-        self.displayCanvas.grid(row = 2, column = 3, rowspan = 4, columnspan = 12, sticky = NSEW, )
+        self.displayCanvas.grid(row = 0, column = 1, rowspan = 8, columnspan = 14, sticky = NSEW)
         self.buildingsLabelframe.grid(row = 2, column = 16, sticky = W)
 
         # Row 3:
@@ -342,7 +365,7 @@ class GUI(Frame):
 
         # Row 5:
         self.building_buildingLabel.grid(row = 5, column = 0, sticky = W)
-        self.display_x_Scrollbar.grid(row = 6, column = 3, columnspan = 13, sticky = EW)
+        self.display_x_Scrollbar.grid(row = 8, column = 1, columnspan = 14, sticky = (N, EW))
 
         # Row 6:
         self.turns_left_building_queueLabel.grid(row = 6, column = 0, sticky = W)
@@ -500,6 +523,7 @@ class Tile:
 
         self.set_image()
         self.set_overlay()
+        self.set_floodfill()
 
 
     def get_id(self):
@@ -526,11 +550,14 @@ class Tile:
     def get_image(self):
         return self.image_final
 
+    def get_floodfill(self):
+        return self.floodfill
+
 
     def set_image(self):
         image_original = Image.open("Graphics/{}".format(self.filename))
-        image_resized = image_original.resize((128, 64))
-        image_final = ImageTk.PhotoImage(image_resized)
+        self.image_resized = image_original.resize((128, 64))
+        image_final = ImageTk.PhotoImage(self.image_resized)
         self.image_final = image_final
 
 
@@ -538,5 +565,14 @@ class Tile:
         if self.overlay != None:
             overlay_original = Image.open("Graphics/{}".format(self.overlay))
             overlay_resized = overlay_original.resize((128, 64))
-            overlay_final = ImageTk.PhotoImage(overlay_resized)
+            overlay_composited = Image.alpha_composite(self.image_resized, overlay_resized)
+            overlay_final = ImageTk.PhotoImage(overlay_composited)
             self.overlay_final = overlay_final
+
+
+    def set_floodfill(self):
+        floodfill = ImageDraw.floodfill(self.image_resized, self.get_loc(), "blue", None)
+        floodfill_opened = BitmapImage(floodfill)
+        # floodfill_composited = Image.alpha_composite(self.image_final, floodfill_opened)
+        # floodfill2 = Image.Image.putpixel()
+        self.floodfill = floodfill_opened

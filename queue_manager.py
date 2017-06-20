@@ -9,7 +9,6 @@ class QueueManager():
     def __init__(self):
         self.building_queue = []
         self.building_queueStringVar = StringVar()
-        self.finished_buildings = []
         self.finished_robots = []
 
 
@@ -112,11 +111,6 @@ class QueueManager():
     def get_currently_building_name(self):
         if self.building_queue:
             return self.building_queue[len(self.building_queue) - 1].get_name()
-
-
-    def set_finished_buildings(self):
-        if self.get_currently_building_index() != None:
-            self.finished_buildings.append(self.building_queue[self.get_currently_building_index()])
 
 
     def set_buildings_collection(self):

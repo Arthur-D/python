@@ -14,14 +14,11 @@ class Building():
     def get_name(self):
         return self.name
 
-
     def get_turns(self):
         return self.turns
 
-
     def get_cost(self):
         return self.cost
-
 
     def get_level(self):
         return self.level
@@ -49,6 +46,7 @@ class BuildingManager:
         self.buildings_names_list = []
         self.building_turns = ""
         self.previous_building = ""
+        self.finished_buildings = [Building({"Name" : "Headquarters", "Turn amount" : 0, "Cost" : "0"})]
         self.finished_buildings_names = []
 
         self.buildingsStringVar = StringVar()
@@ -181,8 +179,8 @@ class BuildingManager:
         self.set_previous_building()
         if self.previous_building:
             self.built_buildingStringVar.set("Built %s" % self.previous_building)
-        self.queuemanager.set_finished_buildings()
-        self.guimanager.set_collectionsCombobox_selection()
+        self.set_finished_buildings()
+        self.guimanager.set_collectionsCombobox_selection(None)
         self.guimanager.set_collectionsScrollbar_visibility()
         self.guimanager.set_finished_buildings_amounts()
         self.queuemanager.remove_from_building_queue()
@@ -190,3 +188,8 @@ class BuildingManager:
         self.turnmanager.set_turns_left_building_queue()
         self.guimanager.set_building_queue_turns()
         self.guimanager.set_building_queueScrollbar_visibility()
+
+
+    def set_finished_buildings(self):
+        if self.queuemanager.get_currently_building_index() != None:
+            self.finished_buildings.append(self.queuemanager.building_queue[self.queuemanager.get_currently_building_index()])
