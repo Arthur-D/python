@@ -75,8 +75,7 @@ class GUI(Frame):
     def initUI(self):
         self.parent.title("Gametest")
         self._root().option_add("*tearOff", FALSE)
-        # self.pack(fill = BOTH, expand = True)
-        self.grid()
+        self.pack(fill = BOTH, expand = True)
         # self.centerWindow(self.parent, 960, 540)
 
 
