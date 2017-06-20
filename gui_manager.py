@@ -1,7 +1,6 @@
-# import tkinter
 from tkinter import *
 from tkinter import ttk
-from PIL import Image, ImageTk, ImageFilter
+from PIL import Image, ImageTk
 
 
 
@@ -52,7 +51,8 @@ class GUI(Frame):
         # Hidden label to display if an invalid name is entered in self.nameentry.
         self.error_playernameLabel = ttk.Label(self, foreground = "red", textvariable = self.gamelogic.error_playernameStringVar)
 
-        self.displayCanvas = ResizingCanvas(self, width = 640, height = 360, scrollregion = "0 0 1280 720", highlightthickness = 0)
+        self.displayCanvas = Canvas(self, width = 640, height = 360, scrollregion = "0 0 1280 720")
+
         self.display_x_Scrollbar = Scrollbar(self, orient = HORIZONTAL, command = self.displayCanvas.xview)
         self.display_y_Scrollbar = Scrollbar(self, orient = VERTICAL, command = self.displayCanvas.yview)
         self.displayCanvas.configure(xscrollcommand = self.display_x_Scrollbar.set, yscrollcommand = self.display_y_Scrollbar.set)
@@ -215,7 +215,7 @@ class GUI(Frame):
                     # self.displayCanvas.create_text(y_loc_x, y_loc_y, text="{} {}".format(tile_concrete.get_id(), tile_concrete.get_name()),
                     #                            font="TkFixedFont 16")
                 if tile_id not in self.concrete:
-                    tile_dirt = Tile(tile_id, y_loc_x, y_loc_y, "dirt", "dirt_border.png", None)
+                    tile_dirt = Tile(tile_id, y_loc_x, y_loc_y, "dirt", "dirt_border.png", "overlay.png")
                     self.tiles.append(tile_dirt)
                     self.displayCanvas.create_image(tile_dirt.get_loc_x(), tile_dirt.get_loc_y(), image = tile_dirt.get_image())
                     # self.displayCanvas.create_text(y_loc_x, y_loc_y, text="{} {}".format(tile_dirt.get_id(), tile_dirt.get_name()), font="TkFixedFont 16")
@@ -236,22 +236,27 @@ class GUI(Frame):
                 self.building_final = building_final
                 self.displayCanvas.create_image(tile.get_loc_x() - 2, tile.get_loc_y() + 3,
                                         image = building_final, anchor = "center")
+        self.displayCanvas.addtag_all("canvas_item")
+        self.displayCanvas.itemconfigure("canvas_item", activeimage = tile_dirt.get_overlay())
+        self.displayCanvas.bind_all("<Button-1>", self.select_tile)
+
+
+    def select_tile(self, displayCanvas):
+        # self.displayCanvas.itemconfigure("canvas_item", foreground = "red")
+        pass
 
 
     # Function with widget configuration.
     def set_UI_configuration(self):
-        # Adding columns and padding space.
+        # Adding weight to rows and columns in order to make them follow suit when resizing the window.
         row_number = 0
         column_number = 0
         while row_number < 11:
             self.grid_rowconfigure(row_number, weight = 1)
-            print("row_number in GUI.UI_configuration: ", row_number)
             row_number += 1
         while column_number < 17:
             self.grid_columnconfigure(column_number, weight = 1)
-            print("column_number in GUI.UI_configuration: ", column_number)
             column_number += 1
-        print(self.grid_rowconfigure(10))
 
 
     # Creating UI elements and setting their parameters. Note: some widgets are in the constructor __init__().
@@ -535,26 +540,3 @@ class Tile:
             overlay_resized = overlay_original.resize((128, 64))
             overlay_final = ImageTk.PhotoImage(overlay_resized)
             self.overlay_final = overlay_final
-
-
-
-
-# a subclass of Canvas for dealing with resizing of windows
-class ResizingCanvas(Canvas):
-    def __init__(self,parent,**kwargs):
-        Canvas.__init__(self,parent,**kwargs)
-        self.bind("<Configure>", self.on_resize)
-        self.height = self.winfo_reqheight()
-        self.width = self.winfo_reqwidth()
-
-
-    def on_resize(self,event):
-        # determine the ratio of old width/height to new width/height
-        wscale = float(event.width)/self.width
-        hscale = float(event.height)/self.height
-        self.width = event.width
-        self.height = event.height
-        # resize the canvas
-        self.config(width=self.width, height=self.height)
-        # rescale all the objects tagged with the "all" tag
-        self.scale("all",0,0,wscale,hscale)
