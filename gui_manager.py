@@ -56,6 +56,7 @@ class GUI(Frame):
         self.set_widgets_on_grid()
         self.set_widget_mouse_bindings()
         self.fill_displayCanvas()
+        self.fill_descriptionCanvas(None)
 
         self.buildingmanager.set_finished_buildings()
         self.set_finished_buildings_amounts()
@@ -193,7 +194,7 @@ class GUI(Frame):
         tiles_x = 0
         tiles_y = 0
         tile_id = 1
-        self.tiles = []
+        self.tiles = {}
         self.concrete = [45, 46, 55, 56]
         for x in range(num_tiles):
             x_loc_x += offset_x
@@ -208,26 +209,60 @@ class GUI(Frame):
                 y_loc_x -= offset_x
                 y_loc_y += offset_y
                 if tile_id in self.concrete:
-                    tile_concrete = Tile(tile_id, y_loc_x, y_loc_y, "concrete", "concrete_border.png", "overlay.png")
-                    self.tiles.append(tile_concrete)
+                    tile_concrete = Tile(tile_id, y_loc_x, y_loc_y, "Concrete", "concrete_border.png", "overlay.png")
+                    self.tiles[tile_id] = tile_concrete
                     self.displayCanvas.create_image(tile_concrete.get_loc_x(), tile_concrete.get_loc_y(), image = tile_concrete.get_image(), activeimage = tile_concrete.get_overlay())
                     # self.displayCanvas.create_text(y_loc_x, y_loc_y, text="{} {}".format(tile_concrete.get_id(), tile_concrete.get_name()),
                     #                            font="TkFixedFont 16")
                 if tile_id not in self.concrete:
-                    tile_dirt = Tile(tile_id, y_loc_x, y_loc_y, "dirt", "dirt_border.png", "overlay.png")
-                    self.tiles.append(tile_dirt)
+                    tile_dirt = Tile(tile_id, y_loc_x, y_loc_y, "Dirt", "dirt_border.png", "overlay.png")
+                    self.tiles[tile_id] = tile_dirt
                     self.displayCanvas.create_image(tile_dirt.get_loc_x(), tile_dirt.get_loc_y(), image = tile_dirt.get_image(), activeimage = tile_dirt.get_overlay())
-                    self.displayCanvas.tag_bind(tile_id, "<1>", self.select_displayCanvas_item)
                     # self.displayCanvas.create_text(y_loc_x, y_loc_y, text="{} {}".format(tile_dirt.get_id(), tile_dirt.get_name()), font="TkFixedFont 16")
                 # tile_y_id_x -= 1
                 # tile_y_id_y += 1
+                self.displayCanvas.tag_bind(tile_id, "<1>", self.select_displayCanvas_item)
                 tiles_y += 1
                 tile_id += 1
                 # for tile in self.tiles:
             # print("tile.get_id(), tile.get_name() in GUI.fill_displayCanvas(): ", tile.get_id(), tile.get_name())
         print("tiles_x, tiles_y in GUI.fill_displayCanvas(): ", tiles_x, tiles_y)
-        for tile in self.tiles:
-            if tile.get_id() == 45:
+        self.set_building_graphics()
+
+
+    def select_displayCanvas_item(self, displayCanvas):
+        selection = self.displayCanvas.find_withtag("current")
+        selection_id = int(selection[0])
+        print("selection_id in GUI.select_displayCanvas_item(): ", selection_id)
+        # print("self.displayCanvas.find_withtag('building') in GUI.select_displayCanvas_item(): ", self.displayCanvas.find_withtag("building"))
+        if selection_id == 101:
+            print("self.buildingmanager.finished_buildings[0].get_name()) in GUI.select_displayCanvas_item(): ", self.buildingmanager.finished_buildings[0].get_name())
+            self.buildingmanager.finished_buildings[0].set_graphics_id(selection_id)
+        if selection_id != 101:
+            for id, tile in self.tiles.items():
+                if selection_id == id and tile.get_overlay():
+                    print("Tile {} is empty".format(tile.get_id()))
+                # else:
+                #     print("Tile {} is not empty".format(tile.get_id()))
+        self.fill_descriptionCanvas(selection_id)
+
+
+    # def get_obstructed_tiles(self):
+    #     for building in self.building_graphics:
+
+
+    def scroll_displayCanvas_start(self, displayCanvas):
+        self.displayCanvas.scan_mark(displayCanvas.x, displayCanvas.y)
+
+
+    def scroll_displayCanvas_end(self, displayCanvas):
+        self.displayCanvas.scan_dragto(displayCanvas.x, displayCanvas.y, 1)
+
+
+    def set_building_graphics(self):
+        self.building_graphics = []
+        for id, tile in self.tiles.items():
+            if id == 45:
                 building = "orange_hq01_cropped.png"
                 building_original = Image.open("Graphics/{}".format(building))
                 building_resized = building_original.resize((123, 121))
@@ -240,24 +275,31 @@ class GUI(Frame):
                 self.building_overlay_final = building_overlay_final
                 self.building_final = building_final
                 self.displayCanvas.create_image(tile.get_loc_x() - 2, tile.get_loc_y() + 3, image = building_final, activeimage = building_overlay_final, anchor = "center", tag = "building")
+                print("tile.get_loc() in GUI.set_building_graphics() for tile 45: ", tile.get_loc())
         self.displayCanvas.tag_bind("building", "<1>", self.select_displayCanvas_item)
+        print("self.displayCanvas.find_withtag('building') in GUI.set_building_graphics(): ", self.displayCanvas.find_withtag("building"))
+        self.building_graphics.append(self.displayCanvas.find_withtag("building"))
+        print("self.building_graphics in GUI.set_building_graphics(): ", self.building_graphics)
 
 
-    def select_displayCanvas_item(self, displayCanvas):
-        selection = self.displayCanvas.find_withtag("current")
-        selection_id = int(selection[0])
-        print("selection_id in GUI.select_displayCanvas_item(): ", selection_id)
-        # print("self.displayCanvas.find_withtag('building') in GUI.select_displayCanvas_item(): ", self.displayCanvas.find_withtag("building"))
-        if selection_id == 101:
-            print("self.buildingmanager.finished_buildings[0].get_name()) in GUI.select_displayCanvas_item(): ", self.buildingmanager.finished_buildings[0].get_name())
+    def fill_descriptionCanvas(self, selection_id):
+        size_x = 160
+        size_y = 160
+        self.descriptionCanvas.configure(width = size_x, height = size_y)
+        if selection_id is not None:
+            self.descriptionCanvas.delete("all")
+            for id, tile in self.tiles.items():
+                if selection_id == id:
+                    self.descriptionCanvas.create_image(size_x / 2, size_y / 2, image = tile.get_image())
+                    self.descriptionCanvas.create_text(size_x / 2, 10, text = tile.get_name(), font = "default")
+            for building in self.buildingmanager.finished_buildings:
+                if selection_id == building.get_graphics_id():
+                    print("selection_id in GUI.fill_descriptionCanvas(): ", selection_id)
+                    self.descriptionCanvas.create_image(size_x / 2, size_y / 2, image = self.building_final)
+                    self.descriptionCanvas.create_text(size_x / 2, 10, text = building.get_name(), font = "default")
+        else:
+            print("Nothing selected")
 
-
-    def scroll_displayCanvas_start(self, displayCanvas):
-        self.displayCanvas.scan_mark(displayCanvas.x, displayCanvas.y)
-
-
-    def scroll_displayCanvas_end(self, displayCanvas):
-        self.displayCanvas.scan_dragto(displayCanvas.x, displayCanvas.y, 1)
 
 
     # Function with widget configuration.
@@ -286,6 +328,7 @@ class GUI(Frame):
 
         self.displayCanvas = Canvas(self, scrollregion = "0 0 1280 720")
         # self.displayCanvas.configure(width = 640, height = 360)
+        self.descriptionCanvas = Canvas(self)
 
         self.display_x_Scrollbar = Scrollbar(self, orient = HORIZONTAL, command = self.displayCanvas.xview)
         self.display_y_Scrollbar = Scrollbar(self, orient = VERTICAL, command = self.displayCanvas.yview)
@@ -338,8 +381,9 @@ class GUI(Frame):
     # Placement of UI elements on the grid.
     def set_widgets_on_grid(self):
         # Row 0:
-        self.resourcesLabelframe.grid(row = 0, column = 0, columnspan = 7, sticky = W)
-        self.energy_resourceLabel.grid(row = 0, column = 1, sticky = W)
+        self.descriptionCanvas.grid(row = 0, column = 0, sticky = NW)
+        self.resourcesLabelframe.grid(row = 0, column = 1, columnspan = 7, sticky = NW)
+        self.energy_resourceLabel.grid(row = 0, column = 1, sticky = NW)
         self.game_statusLabel.grid(row = 0, column = 2)
         self.saved_nameLabel.grid(row = 0, column = 16, sticky = W)
         self.turnLabel.grid(row = 0, column = 16, sticky = E)
@@ -562,12 +606,11 @@ class Tile:
 
 
     def set_overlay(self):
-        if self.overlay != None:
-            overlay_original = Image.open("Graphics/{}".format(self.overlay))
-            overlay_resized = overlay_original.resize((128, 64))
-            overlay_composited = Image.alpha_composite(self.image_resized, overlay_resized)
-            overlay_final = ImageTk.PhotoImage(overlay_composited)
-            self.overlay_final = overlay_final
+        overlay_original = Image.open("Graphics/{}".format(self.overlay))
+        overlay_resized = overlay_original.resize((128, 64))
+        overlay_composited = Image.alpha_composite(self.image_resized, overlay_resized)
+        overlay_final = ImageTk.PhotoImage(overlay_composited)
+        self.overlay_final = overlay_final
 
 
     def set_floodfill(self):

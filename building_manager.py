@@ -9,6 +9,7 @@ class Building():
         self.turns = properties["Turn amount"]
         self.cost = properties["Cost"]
         self.level = 1
+        self.graphics_id = None
 
 
     def get_name(self):
@@ -22,6 +23,13 @@ class Building():
 
     def get_level(self):
         return self.level
+
+    def set_graphics_id(self, graphics_id):
+        self.graphics_id = graphics_id
+
+    def get_graphics_id(self):
+        if self.graphics_id is not None:
+            return self.graphics_id
 
 
     def decrease_turns(self):
