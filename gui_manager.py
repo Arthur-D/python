@@ -240,11 +240,15 @@ class GUI(Frame):
             self.buildingmanager.finished_buildings[0].set_graphics_id(selection_id)
         if selection_id != 101:
             for id, tile in self.tiles.items():
-                if selection_id == id and tile.get_overlay():
+                if selection_id == id:
                     print("Tile {} is empty".format(tile.get_id()))
                 # else:
                 #     print("Tile {} is not empty".format(tile.get_id()))
         self.fill_descriptionCanvas(selection_id)
+
+
+    def fill_buildingCanvas(self):
+        pass
 
 
     # def get_obstructed_tiles(self):
@@ -329,6 +333,7 @@ class GUI(Frame):
         self.displayCanvas = Canvas(self, scrollregion = "0 0 1280 720")
         # self.displayCanvas.configure(width = 640, height = 360)
         self.descriptionCanvas = Canvas(self)
+        self.build_selectionCanvas = Canvas(self, width = 128, height = 128)
 
         self.display_x_Scrollbar = Scrollbar(self, orient = HORIZONTAL, command = self.displayCanvas.xview)
         self.display_y_Scrollbar = Scrollbar(self, orient = VERTICAL, command = self.displayCanvas.yview)
@@ -393,7 +398,8 @@ class GUI(Frame):
         self.built_buildingLabel.grid(row = 1, column = 16, sticky = W)
 
         # Row 2:
-        self.buildingsListbox.grid(row = 2, column = 0, sticky = W)
+        self.build_selectionCanvas.grid(row = 2, column = 0, sticky = NW)
+        # self.buildingsListbox.grid(row = 2, column = 0, sticky = W)
         self.display_y_Scrollbar.grid(row = 0, column = 15, rowspan = 8, sticky = NS + W)
         self.building_descriptionLabel.grid(row = 1, column = 3, sticky = NW)
         self.displayCanvas.grid(row = 0, column = 1, rowspan = 8, columnspan = 14, sticky = NSEW)
