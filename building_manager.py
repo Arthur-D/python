@@ -10,6 +10,7 @@ class Building():
         self.cost = properties["Cost"]
         self.level = 1
         self.graphics_id = None
+        self.graphics = properties["Graphics"]
 
 
     def get_name(self):
@@ -30,6 +31,8 @@ class Building():
     def get_graphics_id(self):
         if self.graphics_id is not None:
             return self.graphics_id
+
+    
 
 
     def decrease_turns(self):
@@ -98,10 +101,10 @@ class BuildingManager:
     # Sets initial properties for buildings and instanciates them.
     def set_building_properties(self):
         self.building_properties = [
-            {"Name" : "Air purifier", "Turn amount" : 4, "Cost" : "80"},
-            {"Name" : "House", "Turn amount" : 5, "Cost" : "25"},
-            {"Name" : "Robot factory", "Turn amount" : 7, "Cost" : "200"},
-            {"Name" : "Water purifier", "Turn amount" : 4, "Cost" : "80"}
+            {"Name" : "Air purifier", "Turn amount" : 4, "Cost" : "80", "Graphics" : "cretebrick970.png"},
+            {"Name" : "House", "Turn amount" : 5, "Cost" : "25", "Graphics" : None},
+            {"Name" : "Robot factory", "Turn amount" : 7, "Cost" : "200", "Graphics" : None},
+            {"Name" : "Water purifier", "Turn amount" : 4, "Cost" : "80", "Graphics" : None}
         ]
         self.set_building_names()
 
